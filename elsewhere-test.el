@@ -1,0 +1,54 @@
+;;; elsewhere-test.el --- Tests for elsewhere.el  -*- lexical-binding: t; -*-
+
+;; Copyright (C) 2023 Wesley Nelson <wgn@wesnel.dev>
+
+;; Author: Wesley Nelson <wgn@wesnel.dev>
+;; Maintainer: Wesley Nelson <wgn@wesnel.dev>
+;; Created: 23 Jul 2023
+
+;; Version: 1.0.0
+;; Package-Requires: ((emacs "24.4") (elsewhere "1.0.0"))
+
+;; Keywords: convenience
+
+;; URL: https://github.com/wesnel/elsewhere
+;; Homepage: https://wesnel.github.io/elsewhere
+
+;; This file is not part of GNU Emacs.
+
+;; This file is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This file is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this file.  If not, see <https://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;;; Change Log:
+
+;; 2023-07-24 - v1.0.0
+;; * Add support for GitHub
+
+;;; Code:
+
+(require 'elsewhere)
+(require 'ert)
+
+(ert-deftest elsewhere--test-elsewhere--build-url-git-github ()
+  "Test the function `elsewhere--build-url-git-github'."
+  ;; TODO: Make this function more reusable for new hosts.
+  (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el"
+                 (elsewhere--build-url-git-github "https://github.com/wesnel/elsewhere.git" "c64ad3953dfbd7bbf23d36fe302b1e54112022d1" "elsewhere.el")))
+  (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el"
+                 (elsewhere--build-url-git-github "git@github.com:wesnel/elsewhere.git" "c64ad3953dfbd7bbf23d36fe302b1e54112022d1" "elsewhere.el"))))
+
+(provide 'elsewhere-test)
+
+;;; elsewhere-test.el ends here
