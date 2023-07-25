@@ -9,6 +9,8 @@ Open a version-controlled file, (optionally) mark a region in the
 file, and call `elsewhere-open` interactively by executing `M-x
 elsewhere-open`. You should see a webpage open in your browser.
 
+![demo](https://raw.githubusercontent.com/wesnel/elsewhere/main/demo.gif)
+
 ## Currently-Supported VC Backends
 
 ### Git
