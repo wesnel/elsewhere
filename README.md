@@ -11,6 +11,10 @@ elsewhere-open`. You should see a webpage open in your browser.
 
 ![demo](https://raw.githubusercontent.com/wesnel/elsewhere/main/demo.gif)
 
+## Requirements
+
+- Emacs version 28.1 or newer
+
 ## Currently-Supported VC Backends
 
 ### Git
