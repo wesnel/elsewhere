@@ -1,0 +1,13 @@
+"changes: tests":
+  - "*_test.el"
+  - "**/*_test.el"
+
+"changes: ci":
+  - ".github/*"
+  - ".github/**/*"
+
+"changes: build":
+  - "Makefile"
+
+"changes: docs":
+  - "README.md"
