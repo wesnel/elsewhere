@@ -15,7 +15,7 @@ elsewhere-open`. You should see a webpage open in your browser.
 
 ### Git
 
-#### GitHub
+- GitHub
 
 ## Gotchas
 
