@@ -62,6 +62,21 @@
   (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2"
                  (elsewhere--build-url-git-github "git@github.com:wesnel/elsewhere.git" "c64ad3953dfbd7bbf23d36fe302b1e54112022d1" "elsewhere.el" 2 2))))
 
+(ert-deftest elsewhere--test-elsewhere--build-url-git-gitlab ()
+  "Test the function `elsewhere--build-url-git-gitlab'."
+  (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el"
+                 (elsewhere--build-url-git-gitlab "https://gitlab.com/wesnel/elsewhere.git" "c64ad3953dfbd7bbf23d36fe302b1e54112022d1" "elsewhere.el")))
+  (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el"
+                 (elsewhere--build-url-git-gitlab "git@gitlab.com:wesnel/elsewhere.git" "c64ad3953dfbd7bbf23d36fe302b1e54112022d1" "elsewhere.el")))
+  (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2-L5"
+                 (elsewhere--build-url-git-gitlab "https://gitlab.com/wesnel/elsewhere.git" "c64ad3953dfbd7bbf23d36fe302b1e54112022d1" "elsewhere.el" 2 5)))
+  (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2-L5"
+                 (elsewhere--build-url-git-gitlab "git@gitlab.com:wesnel/elsewhere.git" "c64ad3953dfbd7bbf23d36fe302b1e54112022d1" "elsewhere.el" 2 5)))
+  (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2"
+                 (elsewhere--build-url-git-gitlab "https://gitlab.com/wesnel/elsewhere.git" "c64ad3953dfbd7bbf23d36fe302b1e54112022d1" "elsewhere.el" 2 2)))
+  (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2"
+                 (elsewhere--build-url-git-gitlab "git@gitlab.com:wesnel/elsewhere.git" "c64ad3953dfbd7bbf23d36fe302b1e54112022d1" "elsewhere.el" 2 2))))
+
 (provide 'elsewhere-test)
 
 ;;; elsewhere-test.el ends here

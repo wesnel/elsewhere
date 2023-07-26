@@ -78,7 +78,23 @@
   :type '(repeat string)
   :group 'convenience)
 
-(defcustom elsewhere-recognized-remotes-git `((,elsewhere-host-regexps-github . elsewhere--build-url-git-github))
+(defcustom elsewhere-host-regexp-gitlab-http "^https?:\/\/\gitlab.com\/"
+  "Regexp for matching the host in a GitLab HTTP remote URL."
+  :type 'string
+  :group 'convenience)
+
+(defcustom elsewhere-host-regexp-gitlab-ssh "^git@gitlab.com:"
+  "Regexp for matching the host in a GitLab SSH remote URL."
+  :type 'string
+  :group 'convenience)
+
+(defcustom elsewhere-host-regexps-gitlab `(,elsewhere-host-regexp-gitlab-http ,elsewhere-host-regexp-gitlab-ssh)
+  "Regexps for matching the host in a GitLab remote URL."
+  :type '(repeat string)
+  :group 'convenience)
+
+(defcustom elsewhere-recognized-remotes-git `((,elsewhere-host-regexps-github . elsewhere--build-url-git-github)
+                                              (,elsewhere-host-regexps-gitlab . elsewhere--build-url-git-gitlab))
   "Maps supported `Git' remote URLs to URL builders."
   :type '(alist :key-type (repeat string)
                 :value-type function)
@@ -160,6 +176,17 @@ delineated by those line numbers will be incorporated into the
 URL."
   (let* ((repo (elsewhere--get-git-repo-path elsewhere-host-regexps-github remote))
          (base (format "https://github.com/%s/blob/%s/%s" repo rev file)))
+    (if (and start end) (if (not (eq start end)) (format "%s#L%d-L%d" base start end)
+                          (format "%s#L%d" base start))
+      base)))
+
+(defun elsewhere--build-url-git-gitlab (remote rev file &optional start end)
+  "Build the URL for the FILE at commit REV from REMOTE on GitLab.
+If the line numbers START and END are provided, then the region
+delineated by those line numbers will be incorporated into the
+URL."
+  (let* ((repo (elsewhere--get-git-repo-path elsewhere-host-regexps-gitlab remote))
+         (base (format "https://gitlab.com/%s/-/blob/%s/%s" repo rev file)))
     (if (and start end) (if (not (eq start end)) (format "%s#L%d-L%d" base start end)
                           (format "%s#L%d" base start))
       base)))
