@@ -90,6 +90,22 @@
   :group 'convenience)
 
 ;;;###autoload
+(defun elsewhere-open (buffer &optional start end)
+  "Open the BUFFER in your web browser.
+If the line numbers START and END are provided, then the region
+delineated by those line numbers will be opened. If this function is
+called interactively, then BUFFER will default to the current buffer
+and START and END will default to the currently-selected region (if
+any)."
+  (interactive (elsewhere--get-interactive-args))
+  (with-current-buffer buffer
+    (save-mark-and-excursion
+      (let* ((start (when start (line-number-at-pos start)))
+             (end (when end (line-number-at-pos end)))
+             (url (elsewhere-build-url buffer start end)))
+        (browse-url url)))))
+
+;;;###autoload
 (defun elsewhere-build-url (buffer &optional start end)
   "Build the URL for the BUFFER.
 If the line numbers START and END are provided, then the region
@@ -156,22 +172,6 @@ URL."
                             (bottom (when end (line-number-at-pos end))))
                        (list (current-buffer) top bottom))
     (list (current-buffer))))
-
-;;;###autoload
-(defun elsewhere-open (buffer &optional start end)
-  "Open the BUFFER in your web browser.
-If the line numbers START and END are provided, then the region
-delineated by those line numbers will be opened. If this function is
-called interactively, then BUFFER will default to the current buffer
-and START and END will default to the currently-selected region (if
-any)."
-  (interactive (elsewhere--get-interactive-args))
-  (with-current-buffer buffer
-    (save-mark-and-excursion
-      (let* ((start (when start (line-number-at-pos start)))
-             (end (when end (line-number-at-pos end)))
-             (url (elsewhere-build-url buffer start end)))
-        (browse-url url)))))
 
 (provide 'elsewhere)
 
