@@ -89,17 +89,23 @@
   :type 'string
   :group 'convenience)
 
+;;;###autoload
 (defun elsewhere-build-url (buffer &optional start end)
   "Build the URL for the BUFFER.
 If the line numbers START and END are provided, then the region
-delineated by those line numbers will be incorporated into the
-URL."
-  (let* ((file (buffer-file-name buffer))
-         (backend (vc-backend file))
-         (pairing (assq backend elsewhere-recognized-backends)))
-    (if (not pairing) (user-error "This VC backend is not supported")
-      (let* ((builder (cdr pairing)))
-        (funcall builder file start end)))))
+delineated by those line numbers will be incorporated into the URL. If
+this function is called interactively, then BUFFER will default to the
+current buffer and START and END will default to the
+currently-selected region (if any)."
+  (interactive (elsewhere--get-interactive-args))
+  (with-current-buffer buffer
+    (save-mark-and-excursion
+      (let* ((file (buffer-file-name buffer))
+             (backend (vc-backend file))
+             (pairing (assq backend elsewhere-recognized-backends)))
+        (if (not pairing) (user-error "This VC backend is not supported")
+          (let* ((builder (cdr pairing)))
+            (funcall builder file start end)))))))
 
 (defun elsewhere--is-matching-any-remote? (prefixes remote)
   "Check if REMOTE matches any remote in the list PREFIXES."
@@ -142,17 +148,24 @@ URL."
                           (format "%s#L%d" base start))
       base)))
 
+(defun elsewhere--get-interactive-args ()
+  "Get the arguments for any interactive functions."
+  (if (use-region-p) (let* ((start (region-beginning))
+                            (end (region-end))
+                            (top (when start (line-number-at-pos start)))
+                            (bottom (when end (line-number-at-pos end))))
+                       (list (current-buffer) top bottom))
+    (list (current-buffer))))
+
 ;;;###autoload
 (defun elsewhere-open (buffer &optional start end)
   "Open the BUFFER in your web browser.
-If the points START and END are provided, then the region
-delineated by those points will be opened. If this function is
-called interactively, then BUFFER will default to the current
-buffer and START and END will default to the currently-selected
-region (if any)."
-  (interactive
-   (if (use-region-p) (list (current-buffer) (region-beginning) (region-end))
-     (list (current-buffer))))
+If the line numbers START and END are provided, then the region
+delineated by those line numbers will be opened. If this function is
+called interactively, then BUFFER will default to the current buffer
+and START and END will default to the currently-selected region (if
+any)."
+  (interactive (elsewhere--get-interactive-args))
   (with-current-buffer buffer
     (save-mark-and-excursion
       (let* ((start (when start (line-number-at-pos start)))

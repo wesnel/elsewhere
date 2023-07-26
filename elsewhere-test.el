@@ -40,6 +40,18 @@
 
 (require 'elsewhere)
 (require 'ert)
+(require 'vc)
+
+(ert-deftest elsewhere--test-elsewhere-build-url ()
+  "Test the function `elsewhere-build-url'."
+  (let* ((buffer (current-buffer))
+         (rev (vc-working-revision buffer)))
+    (should (equal (format "https://github.com/wesnel/elsewhere/blob/%s/elsewhere-test.el" rev)
+                   (elsewhere-build-url buffer)))
+    (should (equal (format "https://github.com/wesnel/elsewhere/blob/%s/elsewhere-test.el#L2-L5" rev)
+                   (elsewhere-build-url buffer 2 5)))
+    (should (equal (format "https://github.com/wesnel/elsewhere/blob/%s/elsewhere-test.el#L2" rev)
+                   (elsewhere-build-url buffer 2 2)))))
 
 (ert-deftest elsewhere--test-elsewhere--build-url-git-github ()
   "Test the function `elsewhere--build-url-git-github'."
