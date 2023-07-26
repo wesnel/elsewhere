@@ -31,6 +31,7 @@ URL in your echo area.
 ### Git
 
 - GitHub
+- GitLab
 
 ## Gotchas
 
