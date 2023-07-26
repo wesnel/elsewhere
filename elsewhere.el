@@ -89,18 +89,17 @@
   :type 'string
   :group 'convenience)
 
-(defun elsewhere--build-url (buffer &optional start end)
+(defun elsewhere-build-url (buffer &optional start end)
   "Build the URL for the BUFFER.
-If the points START and END are provided, then the region
-delineated by those points will be incorporated into the URL."
-  (with-current-buffer buffer
-    (save-mark-and-excursion
-      (let* ((file (buffer-file-name buffer))
-             (backend (vc-backend file))
-             (pairing (assq backend elsewhere-recognized-backends)))
-        (if (not pairing) (user-error "This VC backend is not supported")
-          (let* ((builder (cdr pairing)))
-            (funcall builder file start end)))))))
+If the line numbers START and END are provided, then the region
+delineated by those line numbers will be incorporated into the
+URL."
+  (let* ((file (buffer-file-name buffer))
+         (backend (vc-backend file))
+         (pairing (assq backend elsewhere-recognized-backends)))
+    (if (not pairing) (user-error "This VC backend is not supported")
+      (let* ((builder (cdr pairing)))
+        (funcall builder file start end)))))
 
 (defun elsewhere--is-matching-any-remote? (prefixes remote)
   "Check if REMOTE matches any remote in the list PREFIXES."
@@ -110,8 +109,9 @@ delineated by those points will be incorporated into the URL."
 
 (defun elsewhere--build-url-git (file &optional start end)
   "Build the URL for the FILE on a `Git' remote.
-If the points START and END are provided, then the region
-delineated by those points will be incorporated into the URL."
+If the line numbers START and END are provided, then the region
+delineated by those line numbers will be incorporated into the
+URL."
   (let* ((remote (vc-git-repository-url file))
          (pairing (assoc remote elsewhere-recognized-remotes-git 'elsewhere--is-matching-any-remote?))
          (rev (vc-working-revision file))
@@ -133,12 +133,12 @@ Also, trim the .git suffix from the end of the repository name."
 
 (defun elsewhere--build-url-git-github (remote rev file &optional start end)
   "Build the URL for the FILE at commit REV from REMOTE on GitHub.
-If the points START and END are provided, then the region
-delineated by those points will be incorporated into the URL."
-  ;; TODO: Make this function more reusable for new hosts.
+If the line numbers START and END are provided, then the region
+delineated by those line numbers will be incorporated into the
+URL."
   (let* ((repo (elsewhere--get-git-repo-path elsewhere-host-regexps-github remote))
          (base (format "https://github.com/%s/blob/%s/%s" repo rev file)))
-    (if (and start end) (format "%s#L%d-L%d" base (line-number-at-pos start) (line-number-at-pos end))
+    (if (and start end) (format "%s#L%d-L%d" base start end)
       base)))
 
 ;;;###autoload
@@ -152,8 +152,12 @@ region (if any)."
   (interactive
    (if (use-region-p) (list (current-buffer) (region-beginning) (region-end))
      (list (current-buffer))))
-  (let* ((url (elsewhere--build-url buffer start end)))
-    (browse-url url)))
+  (with-current-buffer buffer
+    (save-mark-and-excursion
+      (let* ((start (when start (line-number-at-pos start)))
+             (end (when end (line-number-at-pos end)))
+             (url (elsewhere-build-url buffer start end)))
+        (browse-url url)))))
 
 (provide 'elsewhere)
 

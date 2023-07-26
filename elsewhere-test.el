@@ -43,7 +43,6 @@
 
 (ert-deftest elsewhere--test-elsewhere--build-url-git-github ()
   "Test the function `elsewhere--build-url-git-github'."
-  ;; TODO: Make this function more reusable for new hosts.
   (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el"
                  (elsewhere--build-url-git-github "https://github.com/wesnel/elsewhere.git" "c64ad3953dfbd7bbf23d36fe302b1e54112022d1" "elsewhere.el")))
   (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el"
