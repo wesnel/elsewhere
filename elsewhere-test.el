@@ -58,7 +58,15 @@
   (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el"
                  (elsewhere--build-url-git-github "https://github.com/wesnel/elsewhere.git" "c64ad3953dfbd7bbf23d36fe302b1e54112022d1" "elsewhere.el")))
   (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el"
-                 (elsewhere--build-url-git-github "git@github.com:wesnel/elsewhere.git" "c64ad3953dfbd7bbf23d36fe302b1e54112022d1" "elsewhere.el"))))
+                 (elsewhere--build-url-git-github "git@github.com:wesnel/elsewhere.git" "c64ad3953dfbd7bbf23d36fe302b1e54112022d1" "elsewhere.el")))
+  (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2-L5"
+                 (elsewhere--build-url-git-github "https://github.com/wesnel/elsewhere.git" "c64ad3953dfbd7bbf23d36fe302b1e54112022d1" "elsewhere.el" 2 5)))
+  (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2-L5"
+                 (elsewhere--build-url-git-github "git@github.com:wesnel/elsewhere.git" "c64ad3953dfbd7bbf23d36fe302b1e54112022d1" "elsewhere.el" 2 5)))
+  (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2"
+                 (elsewhere--build-url-git-github "https://github.com/wesnel/elsewhere.git" "c64ad3953dfbd7bbf23d36fe302b1e54112022d1" "elsewhere.el" 2 2)))
+  (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2"
+                 (elsewhere--build-url-git-github "git@github.com:wesnel/elsewhere.git" "c64ad3953dfbd7bbf23d36fe302b1e54112022d1" "elsewhere.el" 2 2))))
 
 (provide 'elsewhere-test)
 
