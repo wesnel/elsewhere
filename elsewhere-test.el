@@ -12,7 +12,6 @@
 ;; Keywords: convenience
 
 ;; URL: https://github.com/wesnel/elsewhere
-;; Homepage: https://wesnel.github.io/elsewhere
 
 ;; This file is not part of GNU Emacs.
 
@@ -30,11 +29,6 @@
 ;; along with this file.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-
-;;; Change Log:
-
-;; 2023-07-24 - v1.0.0
-;; * Add support for GitHub
 
 ;;; Code:
 
