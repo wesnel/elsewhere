@@ -163,12 +163,12 @@ INTERACTIVE? is non-nil, then the git revision will be calculated
 interactively. Otherwise, the URL will use the current revision."
   (let* ((remote (vc-git-repository-url file))
          (pairing (assoc remote elsewhere-recognized-remotes-git 'elsewhere--is-matching-any-remote?))
-         (file (file-relative-name file (vc-root-dir)))
          (rev (if interactive? (elsewhere--choose-git-revision-interactively (vc-working-revision file))
-                (vc-working-revision file))))
+                (vc-working-revision file)))
+         (path (file-relative-name file (vc-root-dir))))
     (if (not pairing) (user-error "This Git remote is not supported")
       (let* ((builder (cdr pairing)))
-        (funcall builder remote rev file top bottom)))))
+        (funcall builder remote rev path top bottom)))))
 
 (defun elsewhere--get-git-repo-dot-git-path (regexps remote)
   "Use REGEXPS to trim the host information off of REMOTE."
@@ -181,22 +181,22 @@ interactively. Otherwise, the URL will use the current revision."
 Also, trim the .git suffix from the end of the repository name."
   (string-remove-suffix elsewhere-dot-git-suffix (elsewhere--get-git-repo-dot-git-path regexps remote)))
 
-(defun elsewhere--build-url-git-github (remote rev file &optional top bottom)
-  "Build the URL for the FILE at commit REV from REMOTE on GitHub.
+(defun elsewhere--build-url-git-github (remote rev path &optional top bottom)
+  "Build the URL for the PATH at commit REV from REMOTE on GitHub.
 If the line numbers TOP and BOTTOM are provided, then the region
 delineated by those line numbers will be incorporated into the URL."
   (let* ((repo (elsewhere--get-git-repo-path elsewhere-host-regexps-github remote))
-         (base (format "https://github.com/%s/blob/%s/%s" repo rev file)))
+         (base (format "https://github.com/%s/blob/%s/%s" repo rev path)))
     (if (and top bottom) (if (not (eq top bottom)) (format "%s#L%d-L%d" base top bottom)
                           (format "%s#L%d" base top))
       base)))
 
-(defun elsewhere--build-url-git-gitlab (remote rev file &optional top bottom)
-  "Build the URL for the FILE at commit REV from REMOTE on GitLab.
+(defun elsewhere--build-url-git-gitlab (remote rev path &optional top bottom)
+  "Build the URL for the PATH at commit REV from REMOTE on GitLab.
 If the line numbers TOP and BOTTOM are provided, then the region
 delineated by those line numbers will be incorporated into the URL."
   (let* ((repo (elsewhere--get-git-repo-path elsewhere-host-regexps-gitlab remote))
-         (base (format "https://gitlab.com/%s/-/blob/%s/%s" repo rev file)))
+         (base (format "https://gitlab.com/%s/-/blob/%s/%s" repo rev path)))
     (if (and top bottom) (if (not (eq top bottom)) (format "%s#L%d-L%d" base top bottom)
                           (format "%s#L%d" base top))
       base)))
