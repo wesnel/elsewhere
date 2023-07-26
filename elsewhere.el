@@ -39,8 +39,12 @@
 
 ;;; Change Log:
 
-;; 2023-07-24 - v1.0.0
-;; * Add support for GitHub
+;; 2023-07-26 - v1.0.0
+;; * Support `Git' backend from `vc-handled-backends'
+;; * Support GitHub and GitLab
+;; * Support generating URL in echo area
+;; * Support opening generated URL in browser using `browse-url'
+;; * Support choosing a revision for URLs using `completing-read'
 
 ;;; Code:
 
@@ -106,38 +110,44 @@
   :group 'convenience)
 
 ;;;###autoload
-(defun elsewhere-open (buffer &optional start end)
-  "Open the BUFFER in your web browser.
-If the line numbers START and END are provided, then the region
-delineated by those line numbers will be opened. If this function is
-called interactively, then BUFFER will default to the current buffer
-and START and END will default to the currently-selected region (if
-any)."
-  (interactive (elsewhere--get-interactive-args))
-  (with-current-buffer buffer
-    (save-mark-and-excursion
-      (let* ((start (when start (line-number-at-pos start)))
-             (end (when end (line-number-at-pos end)))
-             (url (elsewhere-build-url buffer start end)))
-        (browse-url url)))))
+(defun elsewhere-open (&optional buffer start end interactive?)
+  "Open the current buffer and region in your web browser.
+If BUFFER is not provided, then it will default to the current buffer.
+If the points START and END are provided, then the region
+delineated by those line numbers will be incorporated into the URL.
+Otherwise, START and END will default to the currently-selected
+region (if any). If the function is called interactively, then
+INTERACTIVE? will be set to t."
+  (interactive (list nil nil nil t))
+  (let* ((url (elsewhere-build-url buffer start end interactive?)))
+    (browse-url url)))
 
 ;;;###autoload
-(defun elsewhere-build-url (buffer &optional start end)
-  "Build the URL for the BUFFER.
-If the line numbers START and END are provided, then the region
-delineated by those line numbers will be incorporated into the URL. If
-this function is called interactively, then BUFFER will default to the
-current buffer and START and END will default to the
-currently-selected region (if any)."
-  (interactive (elsewhere--get-interactive-args))
-  (with-current-buffer buffer
-    (save-mark-and-excursion
-      (let* ((file (buffer-file-name buffer))
-             (backend (vc-backend file))
-             (pairing (assq backend elsewhere-recognized-backends)))
-        (if (not pairing) (user-error "This VC backend is not supported")
-          (let* ((builder (cdr pairing)))
-            (funcall builder file start end)))))))
+(defun elsewhere-build-url (&optional buffer start end interactive?)
+  "Build a permalinked URL for the BUFFER and region.
+If BUFFER is not provided, then it will default to the current buffer.
+If the points START and END are provided, then the region
+delineated by those points will be incorporated into the URL.
+Otherwise, START and END will default to the currently-selected
+region (if any). If the function is called interactively, then
+INTERACTIVE? will be set to t."
+  (interactive (list nil nil nil t))
+  (let* ((buffer (or buffer (current-buffer))))
+    (with-current-buffer buffer
+      (save-mark-and-excursion
+        (let* ((use-region (unless (and start end) (use-region-p)))
+               (start (when use-region (region-beginning)))
+               (end (when use-region (region-end)))
+               (top (when start (line-number-at-pos start)))
+               (bottom (when end (line-number-at-pos end)))
+               (file (buffer-file-name buffer))
+               (backend (vc-backend file))
+               (pairing (assq backend elsewhere-recognized-backends)))
+          (if (not pairing) (user-error "This VC backend is not supported")
+            (let* ((builder (cdr pairing))
+                   (url (funcall builder file top bottom interactive?)))
+              (when interactive? (message url))
+              url)))))))
 
 (defun elsewhere--is-matching-any-remote? (prefixes remote)
   "Check if REMOTE matches any remote in the list PREFIXES."
@@ -145,18 +155,20 @@ currently-selected region (if any)."
        (or (string-match-p (car prefixes) remote)
            (elsewhere--is-matching-any-remote? (cdr prefixes) remote))))
 
-(defun elsewhere--build-url-git (file &optional start end)
+(defun elsewhere--build-url-git (file top bottom &optional interactive?)
   "Build the URL for the FILE on a `Git' remote.
-If the line numbers START and END are provided, then the region
-delineated by those line numbers will be incorporated into the
-URL."
+If the line numbers TOP and BOTTOM are provided, then the region
+delineated by those line numbers will be incorporated into the URL. If
+INTERACTIVE? is non-nil, then the git revision will be calculated
+interactively. Otherwise, the URL will use the current revision."
   (let* ((remote (vc-git-repository-url file))
          (pairing (assoc remote elsewhere-recognized-remotes-git 'elsewhere--is-matching-any-remote?))
-         (rev (vc-working-revision file))
-         (file (file-relative-name file (vc-root-dir))))
+         (file (file-relative-name file (vc-root-dir)))
+         (rev (if interactive? (elsewhere--choose-git-revision-interactively (vc-working-revision file))
+                (vc-working-revision file))))
     (if (not pairing) (user-error "This Git remote is not supported")
       (let* ((builder (cdr pairing)))
-        (funcall builder remote rev file start end)))))
+        (funcall builder remote rev file top bottom)))))
 
 (defun elsewhere--get-git-repo-dot-git-path (regexps remote)
   "Use REGEXPS to trim the host information off of REMOTE."
@@ -169,36 +181,36 @@ URL."
 Also, trim the .git suffix from the end of the repository name."
   (string-remove-suffix elsewhere-dot-git-suffix (elsewhere--get-git-repo-dot-git-path regexps remote)))
 
-(defun elsewhere--build-url-git-github (remote rev file &optional start end)
+(defun elsewhere--build-url-git-github (remote rev file &optional top bottom)
   "Build the URL for the FILE at commit REV from REMOTE on GitHub.
-If the line numbers START and END are provided, then the region
-delineated by those line numbers will be incorporated into the
-URL."
+If the line numbers TOP and BOTTOM are provided, then the region
+delineated by those line numbers will be incorporated into the URL."
   (let* ((repo (elsewhere--get-git-repo-path elsewhere-host-regexps-github remote))
          (base (format "https://github.com/%s/blob/%s/%s" repo rev file)))
-    (if (and start end) (if (not (eq start end)) (format "%s#L%d-L%d" base start end)
-                          (format "%s#L%d" base start))
+    (if (and top bottom) (if (not (eq top bottom)) (format "%s#L%d-L%d" base top bottom)
+                          (format "%s#L%d" base top))
       base)))
 
-(defun elsewhere--build-url-git-gitlab (remote rev file &optional start end)
+(defun elsewhere--build-url-git-gitlab (remote rev file &optional top bottom)
   "Build the URL for the FILE at commit REV from REMOTE on GitLab.
-If the line numbers START and END are provided, then the region
-delineated by those line numbers will be incorporated into the
-URL."
+If the line numbers TOP and BOTTOM are provided, then the region
+delineated by those line numbers will be incorporated into the URL."
   (let* ((repo (elsewhere--get-git-repo-path elsewhere-host-regexps-gitlab remote))
          (base (format "https://gitlab.com/%s/-/blob/%s/%s" repo rev file)))
-    (if (and start end) (if (not (eq start end)) (format "%s#L%d-L%d" base start end)
-                          (format "%s#L%d" base start))
+    (if (and top bottom) (if (not (eq top bottom)) (format "%s#L%d-L%d" base top bottom)
+                          (format "%s#L%d" base top))
       base)))
 
-(defun elsewhere--get-interactive-args ()
-  "Get the arguments for any interactive functions."
-  (if (use-region-p) (let* ((start (region-beginning))
-                            (end (region-end))
-                            (top (when start (line-number-at-pos start)))
-                            (bottom (when end (line-number-at-pos end))))
-                       (list (current-buffer) top bottom))
-    (list (current-buffer))))
+(defun elsewhere--choose-git-revision-interactively (default)
+  "Choose the Git revision to use interactively using `completing-read'.
+DEFAULT is used as the default value."
+  (completing-read (format "Choose revision (default %s):" default)
+                   (vc-git-branches)
+                   nil
+                   nil
+                   nil
+                   nil
+                   default))
 
 (provide 'elsewhere)
 
