@@ -138,7 +138,8 @@ delineated by those line numbers will be incorporated into the
 URL."
   (let* ((repo (elsewhere--get-git-repo-path elsewhere-host-regexps-github remote))
          (base (format "https://github.com/%s/blob/%s/%s" repo rev file)))
-    (if (and start end) (format "%s#L%d-L%d" base start end)
+    (if (and start end) (if (not (eq start end)) (format "%s#L%d-L%d" base start end)
+                          (format "%s#L%d" base start))
       base)))
 
 ;;;###autoload
