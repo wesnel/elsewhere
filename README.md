@@ -6,10 +6,21 @@ permalinked webpage in your browser.
 ## Usage
 
 Open a version-controlled file, (optionally) mark a region in the
-file, and call `elsewhere-open` interactively by executing `M-x
-elsewhere-open`. You should see a webpage open in your browser.
+file, and execute `M-x elsewhere-open`. You should see a webpage open
+in your browser. If you want the URL but you don't want to
+automatically open it in your browser, then try `M-x
+elsewhere-build-url` instead. With that command, you should see the
+URL in your echo area.
 
-![demo](https://raw.githubusercontent.com/wesnel/elsewhere/demo/demo.gif)
+## Demo
+
+### `elsewhere-open`
+
+![elsewhere-open](https://raw.githubusercontent.com/wesnel/elsewhere/demo/elsewhere-open.gif)
+
+### `elsewhere-build-url`
+
+![elsewhere-build-url](https://raw.githubusercontent.com/wesnel/elsewhere/demo/elsewhere-build-url.gif)
 
 ## Requirements
 
