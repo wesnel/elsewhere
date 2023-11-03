@@ -15,7 +15,6 @@ jobs:
           - 28.1
           - 28.2
           - 29.1
-          - snapshot
     steps:
       - uses: jcs090218/setup-emacs@master
         with:
