@@ -17,7 +17,7 @@ jobs:
       - uses: jcs090218/setup-emacs@master
         with:
           version: ${{ matrix.emacs-version }}
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: emacs-eldev/setup-eldev@v1
       - run: make lint
       - run: make compile
