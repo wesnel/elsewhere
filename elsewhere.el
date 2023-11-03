@@ -35,7 +35,7 @@
 ;;
 ;; Open a version-controlled file, (optionally) mark a region in the
 ;; file, and call `elsewhere-open' interactively by executing M-x
-;; elsewhere-open. You should see a webpage open in your browser.
+;; elsewhere-open.  You should see a webpage open in your browser.
 
 ;;; Change Log:
 
@@ -116,7 +116,7 @@ If BUFFER is not provided, then it will default to the current buffer.
 If the points START and END are provided, then the region
 delineated by those line numbers will be incorporated into the URL.
 Otherwise, START and END will default to the currently-selected
-region (if any). If the function is called interactively, then
+region (if any).  If the function is called interactively, then
 INTERACTIVE? will be set to t."
   (interactive (list nil nil nil t))
   (let* ((url (elsewhere-build-url buffer start end interactive?)))
@@ -129,7 +129,7 @@ If BUFFER is not provided, then it will default to the current buffer.
 If the points START and END are provided, then the region
 delineated by those points will be incorporated into the URL.
 Otherwise, START and END will default to the currently-selected
-region (if any). If the function is called interactively, then
+region (if any).  If the function is called interactively, then
 INTERACTIVE? will be set to t."
   (interactive (list nil nil nil t))
   (let* ((buffer (or buffer (current-buffer))))
@@ -158,9 +158,9 @@ INTERACTIVE? will be set to t."
 (defun elsewhere--build-url-git (file top bottom &optional interactive?)
   "Build the URL for the FILE on a `Git' remote.
 If the line numbers TOP and BOTTOM are provided, then the region
-delineated by those line numbers will be incorporated into the URL. If
+delineated by those line numbers will be incorporated into the URL.  If
 INTERACTIVE? is non-nil, then the git revision will be calculated
-interactively. Otherwise, the URL will use the current revision."
+interactively.  Otherwise, the URL will use the current revision."
   (let* ((remote (vc-git-repository-url file))
          (pairing (assoc remote elsewhere-recognized-remotes-git 'elsewhere--is-matching-any-remote?))
          (rev (if interactive? (elsewhere--choose-git-revision-interactively (vc-working-revision file))
