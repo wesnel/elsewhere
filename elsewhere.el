@@ -67,7 +67,7 @@
                 :value-type function)
   :group 'convenience)
 
-(defcustom elsewhere-host-regexp-github-http "^https?:\/\/\github.com\/"
+(defcustom elsewhere-host-regexp-github-http "^https?://github.com/"
   "Regexp for matching the host in a GitHub HTTP remote URL."
   :type 'string
   :group 'convenience)
@@ -82,7 +82,7 @@
   :type '(repeat string)
   :group 'convenience)
 
-(defcustom elsewhere-host-regexp-gitlab-http "^https?:\/\/\gitlab.com\/"
+(defcustom elsewhere-host-regexp-gitlab-http "^https?://gitlab.com/"
   "Regexp for matching the host in a GitLab HTTP remote URL."
   :type 'string
   :group 'convenience)
