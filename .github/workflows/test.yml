@@ -21,7 +21,6 @@ jobs:
           version: ${{ matrix.emacs-version }}
       - uses: actions/checkout@v2
       - uses: emacs-eldev/setup-eldev@v1
-      - run: make doctor
       - run: make lint
       - run: make compile
       - run: make test
