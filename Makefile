@@ -1,14 +1,19 @@
-.PHONEY: all build test clean
-
-emacs ?= emacs
-
-all: test
-
-build: clean
-	"$(emacs)" -Q --batch -L . -f batch-byte-compile elsewhere.el
-
-test: build
-	"$(emacs)" -Q --batch -L . -l ert -l elsewhere-test.el -f ert-run-tests-batch-and-exit
-
+.PHONY: clean
 clean:
-	rm -f elsewhere.elc
+	eldev -p -dvQTC clean all
+
+.PHONY: doctor
+doctor:
+	eldev -p -dvQTC doctor
+
+.PHONY: lint
+lint:
+	eldev -p -dtTQC lint
+
+.PHONY: compile
+compile:
+	eldev -p -dtTQC compile --set all --warnings-as-errors
+
+.PHONY: test
+test:
+	eldev -p -dtTQC test
