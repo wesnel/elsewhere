@@ -16,4 +16,4 @@ compile:
 
 .PHONY: test
 test:
-	eldev -dtTQC test
+	eldev -dtTQC -u=always test
