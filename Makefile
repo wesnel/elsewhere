@@ -16,4 +16,4 @@ compile:
 
 .PHONY: test
 test:
-	eldev -dtTQC -U=undercover_coveralls_report test
+	eldev -dtTQC test -U undercover_coveralls_report
