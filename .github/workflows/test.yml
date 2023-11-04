@@ -24,4 +24,3 @@ jobs:
       - run: make lint
       - run: make compile
       - run: make test
-      - uses: coverallsapp/github-action@v2
