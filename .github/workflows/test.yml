@@ -27,12 +27,10 @@ jobs:
         env:
           COVERALLS_FLAG_NAME: run-${{ join(matrix.*, '-') }}
           COVERALLS_PARALLEL: 1
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   finish:
     if: ${{ always() }}
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: coverallsapp/github-action@v2
-        with:
-          parallel-finished: true
+      - run: curl "https://coveralls.io/webhook?repo_name=$GITHUB_REPOSITORY&repo_token=${{ secrets.GITHUB_TOKEN }}" -d "payload[build_num]=$GITHUB_RUN_NUMBER&payload[status]=done"
