@@ -1,3 +1,10 @@
+# Extra stuff
+
+undercover_coveralls_report
+.eldev
+
+# End of extra stuff
+
 # Created by https://www.toptal.com/developers/gitignore/api/elisp,emacs,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=elisp,emacs,macos
 
@@ -7,7 +14,6 @@
 
 # Packaging
 .cask
-.eldev
 
 # Backup files
 *~
