@@ -1,3 +1,7 @@
+[![License: GPL 3](https://img.shields.io/badge/license-GPL_3-green.svg)](http://www.gnu.org/licenses/gpl-3.0.txt)
+[![CI](https://github.com/wesnel/elsewhere/workflows/CI/badge.svg)](https://github.com/wesnel/elsewhere/actions?query=workflow%3ACI)
+[![Coverage Status](https://coveralls.io/repos/github/wesnel/elsewhere/badge.svg?branch=main)](https://coveralls.io/github/wesnel/elsewhere?branch=main)
+
 # `elsewhere.el`: Open version-controlled code from Emacs in your web browser
 
 Use `elsewhere.el` to open a file (or a marked region of a file) as a
