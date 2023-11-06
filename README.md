@@ -24,7 +24,7 @@ URL in your echo area.
 
 ## Requirements
 
-- Emacs version 28.1 or newer
+- Emacs version 29.1 or newer
 
 ## Currently-Supported VC Backends
 

@@ -7,7 +7,7 @@
 ;; Created: 24 Jul 2023
 
 ;; Version: 1.0.0
-;; Package-Requires: ((emacs "28.1"))
+;; Package-Requires: ((emacs "29.1"))
 
 ;; Keywords: convenience
 
