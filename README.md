@@ -32,12 +32,3 @@ URL in your echo area.
 
 - GitHub
 - GitLab
-
-## Gotchas
-
-### Incorrect VC Revision
-
-Since `elsewhere.el` is built in top of `vc`, it is subject to some of
-its quirks. Make sure to run `vc-refresh-state` before
-`elsewhere-open` if you suspect that anything has modified the state
-of the VC behind the scenes.

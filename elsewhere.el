@@ -158,13 +158,19 @@ INTERACTIVE? will be set to t."
 (defun elsewhere--build-url-git (file top bottom &optional interactive?)
   "Build the URL for the FILE on a `Git' remote.
 If the line numbers TOP and BOTTOM are provided, then the region
-delineated by those line numbers will be incorporated into the URL.  If
-INTERACTIVE? is non-nil, then the git revision will be calculated
-interactively.  Otherwise, the URL will use the current revision."
+delineated by those line numbers will be incorporated into the
+URL.  If INTERACTIVE? is non-nil, then the git revision will be
+calculated interactively.  Otherwise, the URL will use the
+current revision of the current buffer."
   (let* ((remote (vc-git-repository-url file))
          (pairing (assoc remote elsewhere-recognized-remotes-git 'elsewhere--is-matching-any-remote?))
-         (rev (if interactive? (elsewhere--choose-git-revision-interactively (vc-working-revision file))
-                (vc-working-revision file)))
+         (rev-output (with-output-to-string
+                      (with-current-buffer standard-output
+                        (vc-git--out-ok "symbolic-ref" "HEAD"))))
+         (has-match (string-match "^\\(refs/heads/\\)?\\(.+\\)$" rev-output))
+         (current-rev (when has-match (match-string 2 rev-output)))
+         (rev (if interactive? (elsewhere--choose-git-revision-interactively current-rev)
+                current-rev))
          (path (file-relative-name file (vc-root-dir))))
     (if (not pairing) (user-error "This Git remote is not supported")
       (let* ((builder (cdr pairing)))
