@@ -143,7 +143,7 @@ INTERACTIVE? will be set to t."
                (file (buffer-file-name buffer))
                (backend (vc-responsible-backend file))
                (pairing (assq backend elsewhere-recognized-backends)))
-          (if (not pairing) (user-error "This VC backend is not supported")
+          (if (not pairing) (user-error "This VC backend is not supported: %s" backend)
             (let* ((builder (cdr pairing))
                    (url (funcall builder file top bottom interactive?)))
               (when interactive? (message url))
