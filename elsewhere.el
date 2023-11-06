@@ -141,7 +141,7 @@ INTERACTIVE? will be set to t."
                (top (when start (line-number-at-pos start)))
                (bottom (when end (line-number-at-pos end)))
                (file (buffer-file-name buffer))
-               (backend (vc-backend file))
+               (backend (vc-responsible-backend file))
                (pairing (assq backend elsewhere-recognized-backends)))
           (if (not pairing) (user-error "This VC backend is not supported")
             (let* ((builder (cdr pairing))
