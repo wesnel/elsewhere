@@ -6,7 +6,7 @@
 ;; Maintainer: Wesley Nelson <wgn@wesnel.dev>
 ;; Created: 24 Jul 2023
 
-;; Version: 1.0.0
+;; Version: 1.1.0
 ;; Package-Requires: ((emacs "29.1"))
 
 ;; Keywords: convenience
@@ -38,6 +38,13 @@
 ;; elsewhere-open.  You should see a webpage open in your browser.
 
 ;;; Change Log:
+
+;; 2023-11-06 - v1.1.0
+;; * Bump minimum Emacs version to 29.1
+;; * Switch to external Git command for fetching the current revision
+;; * Switch to `vc-responsible-backend' for fetching the VC backend
+;; * Add Eldev as the development tool for this package
+;; * Add tests for `elsewhere-build-url'
 
 ;; 2023-07-26 - v1.0.0
 ;; * Support `Git' backend from `vc-handled-backends'
