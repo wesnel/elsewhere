@@ -41,6 +41,11 @@
 
 ;; 2023-11-06 - v1.1.0
 ;; * Bump minimum Emacs version to 29.1
+;; * Remove interactive? argument for `elsewhere-open'
+;; * Remove interactive? argument for `elsewhere-build-url'
+;; * Add headless? argument for `elsewhere-open'
+;; * Add silent? argument for `elsewhere-build-url'
+;; * Add headless? argument for `elsewhere-build-url'
 ;; * Switch to external Git command for fetching the current revision
 ;; * Switch to `vc-responsible-backend' for fetching the VC backend
 ;; * Add Eldev as the development tool for this package
@@ -117,28 +122,29 @@
   :group 'convenience)
 
 ;;;###autoload
-(defun elsewhere-open (&optional buffer start end interactive?)
+(defun elsewhere-open (&optional buffer start end headless?)
   "Open the current buffer and region in your web browser.
-If BUFFER is not provided, then it will default to the current buffer.
-If the points START and END are provided, then the region
-delineated by those line numbers will be incorporated into the URL.
-Otherwise, START and END will default to the currently-selected
-region (if any).  If the function is called interactively, then
-INTERACTIVE? will be set to t."
-  (interactive (list nil nil nil t))
-  (let* ((url (elsewhere-build-url buffer start end interactive?)))
+If BUFFER is not provided, then it will default to the current
+buffer.  If the points START and END are provided, then the
+region delineated by those line numbers will be incorporated into
+the URL.  Otherwise, START and END will default to the
+currently-selected region (if any).  If HEADLESS? is non-nil,
+then do not prompt for user input."
+  (interactive)
+  (let* ((url (elsewhere-build-url buffer start end t headless?)))
     (browse-url url)))
 
 ;;;###autoload
-(defun elsewhere-build-url (&optional buffer start end interactive?)
+(defun elsewhere-build-url (&optional buffer start end silent? headless?)
   "Build a permalinked URL for the BUFFER and region.
-If BUFFER is not provided, then it will default to the current buffer.
-If the points START and END are provided, then the region
-delineated by those points will be incorporated into the URL.
-Otherwise, START and END will default to the currently-selected
-region (if any).  If the function is called interactively, then
-INTERACTIVE? will be set to t."
-  (interactive (list nil nil nil t))
+If BUFFER is not provided, then it will default to the current
+buffer.  If the points START and END are provided, then the
+region delineated by those points will be incorporated into the
+URL.  Otherwise, START and END will default to the
+currently-selected region (if any).  If SILENT? is non-nil, then
+suppress the writing of the URL to the echo area.  If HEADLESS?
+is non-nil, then do not prompt for user input."
+  (interactive)
   (let* ((buffer (or buffer (current-buffer))))
     (with-current-buffer buffer
       (save-mark-and-excursion
@@ -152,8 +158,8 @@ INTERACTIVE? will be set to t."
                (pairing (assq backend elsewhere-recognized-backends)))
           (if (not pairing) (user-error "This VC backend is not supported: %s" backend)
             (let* ((builder (cdr pairing))
-                   (url (funcall builder file top bottom interactive?)))
-              (when interactive? (message url))
+                   (url (funcall builder file top bottom headless?)))
+              (unless silent? (message url))
               url)))))))
 
 (defun elsewhere--is-matching-any-remote? (prefixes remote)
@@ -162,13 +168,13 @@ INTERACTIVE? will be set to t."
        (or (string-match-p (car prefixes) remote)
            (elsewhere--is-matching-any-remote? (cdr prefixes) remote))))
 
-(defun elsewhere--build-url-git (file top bottom &optional interactive?)
+(defun elsewhere--build-url-git (file top bottom &optional headless?)
   "Build the URL for the FILE on a `Git' remote.
 If the line numbers TOP and BOTTOM are provided, then the region
 delineated by those line numbers will be incorporated into the
-URL.  If INTERACTIVE? is non-nil, then the git revision will be
-calculated interactively.  Otherwise, the URL will use the
-current revision of the current buffer."
+URL.  If HEADLESS? is non-nil, then the Git revision will be the
+current revision of the current buffer.  Otherwise, the Git
+revision will be chosen using `completing-read'."
   (let* ((remote (vc-git-repository-url file))
          (pairing (assoc remote elsewhere-recognized-remotes-git 'elsewhere--is-matching-any-remote?))
          (rev-output (with-output-to-string
@@ -176,8 +182,8 @@ current revision of the current buffer."
                         (vc-git--out-ok "symbolic-ref" "HEAD"))))
          (has-match (string-match "^\\(refs/heads/\\)?\\(.+\\)$" rev-output))
          (current-rev (when has-match (match-string 2 rev-output)))
-         (rev (if interactive? (elsewhere--choose-git-revision-interactively current-rev)
-                current-rev))
+         (rev (if headless? current-rev
+                (elsewhere--choose-git-revision-interactively current-rev)))
          (path (file-relative-name file (vc-root-dir))))
     (if (not pairing) (user-error "This Git remote is not supported")
       (let* ((builder (cdr pairing)))

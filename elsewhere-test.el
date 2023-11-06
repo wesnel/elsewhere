@@ -180,7 +180,7 @@ a `default-directory' equal to this temporary test directory."
            '(("\\`http" . (lambda (url &rest args)
                             (should (equal "https://github.com/wesnel/elsewhere/blob/main/elsewhere.el"
                                            url)))))))
-     (elsewhere-open)))
+     (elsewhere-open nil nil nil t)))
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -191,7 +191,7 @@ a `default-directory' equal to this temporary test directory."
            '(("\\`http" . (lambda (url &rest args)
                             (should (equal "https://github.com/wesnel/elsewhere/blob/main/elsewhere.el"
                                            url)))))))
-     (elsewhere-open)))
+     (elsewhere-open nil nil nil t)))
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -202,7 +202,7 @@ a `default-directory' equal to this temporary test directory."
            '(("\\`http" . (lambda (url &rest args)
                             (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el"
                                            url)))))))
-     (elsewhere-open)))
+     (elsewhere-open nil nil nil t)))
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -213,7 +213,7 @@ a `default-directory' equal to this temporary test directory."
            '(("\\`http" . (lambda (url &rest args)
                             (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el"
                                            url)))))))
-     (elsewhere-open)))
+     (elsewhere-open nil nil nil t)))
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -233,7 +233,7 @@ a `default-directory' equal to this temporary test directory."
      (should (equal 5 (line-number-at-pos)))
      (should (equal 2 (line-number-at-pos (mark))))
      (should (use-region-p))
-     (elsewhere-open)))
+     (elsewhere-open nil nil nil t)))
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -253,7 +253,7 @@ a `default-directory' equal to this temporary test directory."
      (should (equal 5 (line-number-at-pos)))
      (should (equal 2 (line-number-at-pos (mark))))
      (should (use-region-p))
-     (elsewhere-open)))
+     (elsewhere-open nil nil nil t)))
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -272,7 +272,7 @@ a `default-directory' equal to this temporary test directory."
      (forward-char)
      (should (equal 2 (line-number-at-pos (mark))))
      (should (use-region-p))
-     (elsewhere-open)))
+     (elsewhere-open nil nil nil t)))
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -291,7 +291,7 @@ a `default-directory' equal to this temporary test directory."
      (forward-char)
      (should (equal 2 (line-number-at-pos (mark))))
      (should (use-region-p))
-     (elsewhere-open)))
+     (elsewhere-open nil nil nil t)))
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -302,7 +302,7 @@ a `default-directory' equal to this temporary test directory."
            '(("\\`http" . (lambda (url &rest args)
                             (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/main/elsewhere.el"
                                            url)))))))
-     (elsewhere-open)))
+     (elsewhere-open nil nil nil t)))
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -313,7 +313,7 @@ a `default-directory' equal to this temporary test directory."
            '(("\\`http" . (lambda (url &rest args)
                             (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/main/elsewhere.el"
                                            url)))))))
-     (elsewhere-open)))
+     (elsewhere-open nil nil nil t)))
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -324,7 +324,7 @@ a `default-directory' equal to this temporary test directory."
            '(("\\`http" . (lambda (url &rest args)
                             (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el"
                                            url)))))))
-     (elsewhere-open)))
+     (elsewhere-open nil nil nil t)))
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -335,7 +335,7 @@ a `default-directory' equal to this temporary test directory."
            '(("\\`http" . (lambda (url &rest args)
                             (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el"
                                            url)))))))
-     (elsewhere-open)))
+     (elsewhere-open nil nil nil t)))
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -355,7 +355,7 @@ a `default-directory' equal to this temporary test directory."
      (should (equal 5 (line-number-at-pos)))
      (should (equal 2 (line-number-at-pos (mark))))
      (should (use-region-p))
-     (elsewhere-open)))
+     (elsewhere-open nil nil nil t)))
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -375,7 +375,7 @@ a `default-directory' equal to this temporary test directory."
      (should (equal 5 (line-number-at-pos)))
      (should (equal 2 (line-number-at-pos (mark))))
      (should (use-region-p))
-     (elsewhere-open)))
+     (elsewhere-open nil nil nil t)))
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -394,7 +394,7 @@ a `default-directory' equal to this temporary test directory."
      (forward-char)
      (should (equal 2 (line-number-at-pos (mark))))
      (should (use-region-p))
-     (elsewhere-open)))
+     (elsewhere-open nil nil nil t)))
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -413,7 +413,7 @@ a `default-directory' equal to this temporary test directory."
      (forward-char)
      (should (equal 2 (line-number-at-pos (mark))))
      (should (use-region-p))
-     (elsewhere-open))))
+     (elsewhere-open nil nil nil t))))
 
 (provide 'elsewhere-test)
 
