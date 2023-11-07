@@ -173,6 +173,82 @@ a `default-directory' equal to this temporary test directory."
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
+    :remote "https://example.com/wesnel/elsewhere.git"
+    :branch "main"
+    :test-file-name "elsewhere.el")
+   (let* ((browse-url-handlers
+           '(("\\`http" . (lambda (url &rest args)
+                            (ert-fail "Bad URL was opened"))))))
+     (should (length= browse-url-handlers 1))
+     (should-error
+      (elsewhere-open nil nil nil t)
+      :type 'user-error)))
+  (elsewhere--test-with-repo
+   'Git
+   (make-elsewhere--test-repo-spec-git
+    :remote "https://github.com/wesnel/elsewhere.git"
+    :branch "main"
+    :test-file-name "elsewhere.el")
+   (let* ((elsewhere-recognized-backends nil)
+          (browse-url-handlers
+           '(("\\`http" . (lambda (url &rest args)
+                            (ert-fail "Bad URL was opened"))))))
+     (should (length= browse-url-handlers 1))
+     (should-error
+      (elsewhere-open nil nil nil t)
+      :type 'user-error)))
+  (elsewhere--test-with-repo
+   'Git
+   (make-elsewhere--test-repo-spec-git
+    :remote "https://github.com/wesnel/elsewhere.git"
+    :branch "main"
+    :test-file-name "elsewhere.el"
+    :test-file-contents "1\n2\n3\n4\n5\n6\n7")
+   (let* ((browse-url-handlers
+           '(("\\`http" . (lambda (url &rest args)
+                            (should (equal "https://github.com/wesnel/elsewhere/blob/main/elsewhere.el#L2-L5"
+                                           url)))))))
+     (should (length= browse-url-handlers 1))
+     (transient-mark-mode +1)
+     (forward-line)
+     (should (equal 2 (line-number-at-pos)))
+     (push-mark nil t t)
+     (forward-line 3)
+     (should (equal 5 (line-number-at-pos)))
+     (should (equal 2 (line-number-at-pos (mark))))
+     (let* ((start (region-beginning))
+            (end (region-end)))
+       (deactivate-mark)
+       (should (not (use-region-p)))
+       (should (equal 2 (line-number-at-pos start)))
+       (should (equal 5 (line-number-at-pos end)))
+       (elsewhere-open nil start end t))))
+  (elsewhere--test-with-repo
+   'Git
+   (make-elsewhere--test-repo-spec-git
+    :remote "https://github.com/wesnel/elsewhere.git"
+    :branch "main"
+    :test-file-name "elsewhere.el"
+    :test-file-contents "1\n2\n3\n4\n5\n6\n7")
+   (let* ((browse-url-handlers
+           '(("\\`http" . (lambda (url &rest args)
+                            (should (equal "https://github.com/wesnel/elsewhere/blob/main/elsewhere.el"
+                                           url)))))))
+     (should (length= browse-url-handlers 1))
+     (transient-mark-mode +1)
+     (forward-line)
+     (should (equal 2 (line-number-at-pos)))
+     (push-mark nil t t)
+     (forward-line 3)
+     (should (equal 5 (line-number-at-pos)))
+     (should (equal 2 (line-number-at-pos (mark))))
+     (let* ((start (region-beginning)))
+       (deactivate-mark)
+       (should (not (use-region-p)))
+       (elsewhere-open nil start nil t))))
+  (elsewhere--test-with-repo
+   'Git
+   (make-elsewhere--test-repo-spec-git
     :remote "https://github.com/wesnel/elsewhere.git"
     :branch "main"
     :test-file-name "elsewhere.el")
