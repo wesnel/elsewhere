@@ -178,8 +178,7 @@ a `default-directory' equal to this temporary test directory."
            (run-hooks 'elsewhere--test-cleanup-hook)
            (message "Finished running test cleanup hooks"))))))
 
-(ert-deftest elsewhere--test-elsewhere-open ()
-  "Test the function `elsewhere-open'."
+(ert-deftest elsewhere--test-elsewhere-open-git-remote-not-supported ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -192,7 +191,9 @@ a `default-directory' equal to this temporary test directory."
      (should (length= browse-url-handlers 1))
      (should-error
       (elsewhere-open nil nil nil t)
-      :type 'user-error)))
+      :type 'user-error))))
+
+(ert-deftest elsewhere--test-elsewhere-open-backend-not-supported ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -206,7 +207,9 @@ a `default-directory' equal to this temporary test directory."
      (should (length= browse-url-handlers 1))
      (should-error
       (elsewhere-open nil nil nil t)
-      :type 'user-error)))
+      :type 'user-error))))
+
+(ert-deftest elsewhere--test-elsewhere-open-with-start-and-end ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -231,7 +234,9 @@ a `default-directory' equal to this temporary test directory."
        (should (not (use-region-p)))
        (should (equal 2 (line-number-at-pos start)))
        (should (equal 5 (line-number-at-pos end)))
-       (elsewhere-open nil start end t))))
+       (elsewhere-open nil start end t)))))
+
+(ert-deftest elsewhere--test-elsewhere-open-with-start ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -253,7 +258,9 @@ a `default-directory' equal to this temporary test directory."
      (let* ((start (region-beginning)))
        (deactivate-mark)
        (should (not (use-region-p)))
-       (elsewhere-open nil start nil t))))
+       (elsewhere-open nil start nil t)))))
+
+(ert-deftest elsewhere--test-elsewhere-open-github-http-main ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -265,7 +272,9 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://github.com/wesnel/elsewhere/blob/main/elsewhere.el"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (elsewhere-open nil nil nil t)))
+     (elsewhere-open nil nil nil t))))
+
+(ert-deftest elsewhere--test-elsewhere-open-github-ssh-main ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -277,7 +286,9 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://github.com/wesnel/elsewhere/blob/main/elsewhere.el"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (elsewhere-open nil nil nil t)))
+     (elsewhere-open nil nil nil t))))
+
+(ert-deftest elsewhere--test-elsewhere-open-github-http-rev ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -289,7 +300,9 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (elsewhere-open nil nil nil t)))
+     (elsewhere-open nil nil nil t))))
+
+(ert-deftest elsewhere--test-elsewhere-open-github-ssh-rev ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -301,7 +314,9 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (elsewhere-open nil nil nil t)))
+     (elsewhere-open nil nil nil t))))
+
+(ert-deftest elsewhere--test-elsewhere-open-github-http-rev-with-region ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -321,7 +336,9 @@ a `default-directory' equal to this temporary test directory."
      (should (equal 5 (line-number-at-pos)))
      (should (equal 2 (line-number-at-pos (mark))))
      (should (use-region-p))
-     (elsewhere-open nil nil nil t)))
+     (elsewhere-open nil nil nil t))))
+
+(ert-deftest elsewhere--test-elsewhere-open-github-ssh-rev-with-region ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -341,7 +358,9 @@ a `default-directory' equal to this temporary test directory."
      (should (equal 5 (line-number-at-pos)))
      (should (equal 2 (line-number-at-pos (mark))))
      (should (use-region-p))
-     (elsewhere-open nil nil nil t)))
+     (elsewhere-open nil nil nil t))))
+
+(ert-deftest elsewhere--test-elsewhere-open-github-http-rev-with-region-one-line ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -360,7 +379,9 @@ a `default-directory' equal to this temporary test directory."
      (forward-char)
      (should (equal 2 (line-number-at-pos (mark))))
      (should (use-region-p))
-     (elsewhere-open nil nil nil t)))
+     (elsewhere-open nil nil nil t))))
+
+(ert-deftest elsewhere--test-elsewhere-open-github-ssh-rev-with-region-one-line ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -379,7 +400,9 @@ a `default-directory' equal to this temporary test directory."
      (forward-char)
      (should (equal 2 (line-number-at-pos (mark))))
      (should (use-region-p))
-     (elsewhere-open nil nil nil t)))
+     (elsewhere-open nil nil nil t))))
+
+(ert-deftest elsewhere--test-elsewhere-open-gitlab-http-main ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -391,7 +414,9 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/main/elsewhere.el"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (elsewhere-open nil nil nil t)))
+     (elsewhere-open nil nil nil t))))
+
+(ert-deftest elsewhere--test-elsewhere-open-gitlab-ssh-main ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -403,7 +428,9 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/main/elsewhere.el"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (elsewhere-open nil nil nil t)))
+     (elsewhere-open nil nil nil t))))
+
+(ert-deftest elsewhere--test-elsewhere-open-gitlab-http-rev ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -415,7 +442,9 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (elsewhere-open nil nil nil t)))
+     (elsewhere-open nil nil nil t))))
+
+(ert-deftest elsewhere--test-elsewhere-open-gitlab-ssh-rev ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -427,7 +456,9 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (elsewhere-open nil nil nil t)))
+     (elsewhere-open nil nil nil t))))
+
+(ert-deftest elsewhere--test-elsewhere-open-gitlab-http-rev-with-region ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -447,7 +478,9 @@ a `default-directory' equal to this temporary test directory."
      (should (equal 5 (line-number-at-pos)))
      (should (equal 2 (line-number-at-pos (mark))))
      (should (use-region-p))
-     (elsewhere-open nil nil nil t)))
+     (elsewhere-open nil nil nil t))))
+
+(ert-deftest elsewhere--test-elsewhere-open-gitlab-ssh-rev-with-region ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -467,7 +500,9 @@ a `default-directory' equal to this temporary test directory."
      (should (equal 5 (line-number-at-pos)))
      (should (equal 2 (line-number-at-pos (mark))))
      (should (use-region-p))
-     (elsewhere-open nil nil nil t)))
+     (elsewhere-open nil nil nil t))))
+
+(ert-deftest elsewhere--test-elsewhere-open-gitlab-http-rev-with-region-one-line ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -486,7 +521,9 @@ a `default-directory' equal to this temporary test directory."
      (forward-char)
      (should (equal 2 (line-number-at-pos (mark))))
      (should (use-region-p))
-     (elsewhere-open nil nil nil t)))
+     (elsewhere-open nil nil nil t))))
+
+(ert-deftest elsewhere--test-elsewhere-open-gitlab-ssh-rev-with-region-one-line ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -505,7 +542,12 @@ a `default-directory' equal to this temporary test directory."
      (forward-char)
      (should (equal 2 (line-number-at-pos (mark))))
      (should (use-region-p))
-     (elsewhere-open nil nil nil t)))
+     (elsewhere-open nil nil nil t))))
+
+;;
+
+
+(ert-deftest elsewhere--test-elsewhere-open-sourcehut-http-main ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -517,7 +559,9 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/main/item/elsewhere.el"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (elsewhere-open nil nil nil t)))
+     (elsewhere-open nil nil nil t))))
+
+(ert-deftest elsewhere--test-elsewhere-open-sourcehut-ssh-main ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -529,7 +573,9 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/main/item/elsewhere.el"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (elsewhere-open nil nil nil t)))
+     (elsewhere-open nil nil nil t))))
+
+(ert-deftest elsewhere--test-elsewhere-open-sourcehut-http-rev ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -541,7 +587,9 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/item/elsewhere.el"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (elsewhere-open nil nil nil t)))
+     (elsewhere-open nil nil nil t))))
+
+(ert-deftest elsewhere--test-elsewhere-open-sourcehut-ssh-rev ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -553,7 +601,9 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/item/elsewhere.el"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (elsewhere-open nil nil nil t)))
+     (elsewhere-open nil nil nil t))))
+
+(ert-deftest elsewhere--test-elsewhere-open-sourcehut-http-rev-with-region ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -573,7 +623,9 @@ a `default-directory' equal to this temporary test directory."
      (should (equal 5 (line-number-at-pos)))
      (should (equal 2 (line-number-at-pos (mark))))
      (should (use-region-p))
-     (elsewhere-open nil nil nil t)))
+     (elsewhere-open nil nil nil t))))
+
+(ert-deftest elsewhere--test-elsewhere-open-sourcehut-ssh-rev-with-region ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -593,7 +645,9 @@ a `default-directory' equal to this temporary test directory."
      (should (equal 5 (line-number-at-pos)))
      (should (equal 2 (line-number-at-pos (mark))))
      (should (use-region-p))
-     (elsewhere-open nil nil nil t)))
+     (elsewhere-open nil nil nil t))))
+
+(ert-deftest elsewhere--test-elsewhere-open-sourcehut-http-rev-with-region-one-line ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
@@ -612,7 +666,9 @@ a `default-directory' equal to this temporary test directory."
      (forward-char)
      (should (equal 2 (line-number-at-pos (mark))))
      (should (use-region-p))
-     (elsewhere-open nil nil nil t)))
+     (elsewhere-open nil nil nil t))))
+
+(ert-deftest elsewhere--test-elsewhere-open-sourcehut-ssh-rev-with-region-one-line ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
