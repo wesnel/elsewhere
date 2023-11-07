@@ -34,5 +34,5 @@ URL in your echo area.
 
 ### Git
 
-- GitHub
-- GitLab
+- [GitHub](https://github.com/)
+- [GitLab](https://gitlab.com/)
