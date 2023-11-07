@@ -6,7 +6,7 @@
 ;; Maintainer: Wesley Nelson <wgn@wesnel.dev>
 ;; Created: 24 Jul 2023
 
-;; Version: 1.1.0
+;; Version: 1.2.0
 ;; Package-Requires: ((emacs "29.1"))
 
 ;; Keywords: convenience
@@ -38,6 +38,9 @@
 ;; elsewhere-open.  You should see a webpage open in your browser.
 
 ;;; Change Log:
+
+;; 2023-11-07 - v1.2.0
+;; * Add support for Sourcehut
 
 ;; 2023-11-06 - v1.1.0
 ;; * Bump minimum Emacs version to 29.1
