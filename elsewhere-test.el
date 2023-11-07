@@ -141,14 +141,24 @@ a `default-directory' equal to this temporary test directory."
      (let* ((vc-handled-backends (list ,backend))
             (default-directory tempdir)
             (process-environment process-environment)
+            (should-toggle-transient-mark-mode (not transient-mark-mode))
             elsewhere--test-cleanup-hook)
        (unwind-protect
            (progn
+             (when should-toggle-transient-mark-mode
+               (message "Turning on transient-mark-mode")
+               (transient-mark-mode +1))
+
              (add-hook
               'elsewhere--test-cleanup-hook
               (lambda ()
                 (message "Running test cleanup hook")
                 (elsewhere--test-destroy-repo ,spec)
+
+                (when should-toggle-transient-mark-mode
+                  (message "Turning off transient-mark-mode")
+                  (transient-mark-mode -1))
+
                 (message "Finished running test cleanup hook")))
 
              (should (file-directory-p default-directory))
@@ -209,7 +219,6 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://github.com/wesnel/elsewhere/blob/main/elsewhere.el#L2-L5"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (transient-mark-mode +1)
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
      (push-mark nil t t)
@@ -235,7 +244,6 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://github.com/wesnel/elsewhere/blob/main/elsewhere.el"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (transient-mark-mode +1)
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
      (push-mark nil t t)
@@ -306,7 +314,6 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2-L5"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (transient-mark-mode +1)
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
      (push-mark nil t t)
@@ -327,7 +334,6 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2-L5"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (transient-mark-mode +1)
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
      (push-mark nil t t)
@@ -348,7 +354,6 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (transient-mark-mode +1)
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
      (push-mark nil t t)
@@ -368,7 +373,6 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (transient-mark-mode +1)
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
      (push-mark nil t t)
@@ -436,7 +440,6 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2-L5"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (transient-mark-mode +1)
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
      (push-mark nil t t)
@@ -457,7 +460,6 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2-L5"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (transient-mark-mode +1)
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
      (push-mark nil t t)
@@ -478,7 +480,6 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (transient-mark-mode +1)
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
      (push-mark nil t t)
@@ -498,7 +499,6 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (transient-mark-mode +1)
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
      (push-mark nil t t)
@@ -566,7 +566,6 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/item/elsewhere.el#L2-5"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (transient-mark-mode +1)
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
      (push-mark nil t t)
@@ -587,7 +586,6 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/item/elsewhere.el#L2-5"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (transient-mark-mode +1)
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
      (push-mark nil t t)
@@ -608,7 +606,6 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/item/elsewhere.el#L2"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (transient-mark-mode +1)
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
      (push-mark nil t t)
@@ -628,7 +625,6 @@ a `default-directory' equal to this temporary test directory."
                             (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/item/elsewhere.el#L2"
                                            url)))))))
      (should (length= browse-url-handlers 1))
-     (transient-mark-mode +1)
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
      (push-mark nil t t)
