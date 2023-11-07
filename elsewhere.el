@@ -41,6 +41,7 @@
 
 ;; 2023-11-07 - v1.2.0
 ;; * Add support for Sourcehut
+;; * Fix broken start and end arguments for `elsewhere-build-url'
 
 ;; 2023-11-06 - v1.1.0
 ;; * Bump minimum Emacs version to 29.1
@@ -168,8 +169,8 @@ is non-nil, then do not prompt for user input."
     (with-current-buffer buffer
       (save-mark-and-excursion
         (let* ((use-region (unless (and start end) (use-region-p)))
-               (start (when use-region (region-beginning)))
-               (end (when use-region (region-end)))
+               (start (if use-region (region-beginning) start))
+               (end (if use-region (region-end) end))
                (top (when start (line-number-at-pos start)))
                (bottom (when end (line-number-at-pos end)))
                (file (buffer-file-name buffer))
