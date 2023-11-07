@@ -197,8 +197,8 @@ revision will be chosen using `completing-read'."
   (let* ((remote (vc-git-repository-url file))
          (pairing (assoc remote elsewhere-recognized-remotes-git 'elsewhere--is-matching-any-remote?))
          (rev-output (with-output-to-string
-                      (with-current-buffer standard-output
-                        (vc-git--out-ok "symbolic-ref" "HEAD"))))
+                       (with-current-buffer standard-output
+                         (vc-git--out-ok "symbolic-ref" "HEAD"))))
          (has-match (string-match "^\\(refs/heads/\\)?\\(.+\\)$" rev-output))
          (current-rev (when has-match (match-string 2 rev-output)))
          (rev (if headless? current-rev
@@ -226,7 +226,7 @@ delineated by those line numbers will be incorporated into the URL."
   (let* ((repo (elsewhere--get-git-repo-path elsewhere-host-regexps-github remote))
          (base (format "https://github.com/%s/blob/%s/%s" repo rev path)))
     (if (and top bottom) (if (not (eq top bottom)) (format "%s#L%d-L%d" base top bottom)
-                          (format "%s#L%d" base top))
+                           (format "%s#L%d" base top))
       base)))
 
 (defun elsewhere--build-url-git-gitlab (remote rev path &optional top bottom)
@@ -236,7 +236,7 @@ delineated by those line numbers will be incorporated into the URL."
   (let* ((repo (elsewhere--get-git-repo-path elsewhere-host-regexps-gitlab remote))
          (base (format "https://gitlab.com/%s/-/blob/%s/%s" repo rev path)))
     (if (and top bottom) (if (not (eq top bottom)) (format "%s#L%d-L%d" base top bottom)
-                          (format "%s#L%d" base top))
+                           (format "%s#L%d" base top))
       base)))
 
 (defun elsewhere--build-url-git-sourcehut (remote rev path &optional top bottom)
