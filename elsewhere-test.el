@@ -180,6 +180,7 @@ a `default-directory' equal to this temporary test directory."
            '(("\\`http" . (lambda (url &rest args)
                             (should (equal "https://github.com/wesnel/elsewhere/blob/main/elsewhere.el"
                                            url)))))))
+     (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t)))
   (elsewhere--test-with-repo
    'Git
@@ -191,6 +192,7 @@ a `default-directory' equal to this temporary test directory."
            '(("\\`http" . (lambda (url &rest args)
                             (should (equal "https://github.com/wesnel/elsewhere/blob/main/elsewhere.el"
                                            url)))))))
+     (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t)))
   (elsewhere--test-with-repo
    'Git
@@ -202,6 +204,7 @@ a `default-directory' equal to this temporary test directory."
            '(("\\`http" . (lambda (url &rest args)
                             (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el"
                                            url)))))))
+     (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t)))
   (elsewhere--test-with-repo
    'Git
@@ -213,6 +216,7 @@ a `default-directory' equal to this temporary test directory."
            '(("\\`http" . (lambda (url &rest args)
                             (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el"
                                            url)))))))
+     (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t)))
   (elsewhere--test-with-repo
    'Git
@@ -225,6 +229,7 @@ a `default-directory' equal to this temporary test directory."
            '(("\\`http" . (lambda (url &rest args)
                             (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2-L5"
                                            url)))))))
+     (should (length= browse-url-handlers 1))
      (transient-mark-mode +1)
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -245,6 +250,7 @@ a `default-directory' equal to this temporary test directory."
            '(("\\`http" . (lambda (url &rest args)
                             (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2-L5"
                                            url)))))))
+     (should (length= browse-url-handlers 1))
      (transient-mark-mode +1)
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -265,6 +271,7 @@ a `default-directory' equal to this temporary test directory."
            '(("\\`http" . (lambda (url &rest args)
                             (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2"
                                            url)))))))
+     (should (length= browse-url-handlers 1))
      (transient-mark-mode +1)
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -284,6 +291,7 @@ a `default-directory' equal to this temporary test directory."
            '(("\\`http" . (lambda (url &rest args)
                             (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2"
                                            url)))))))
+     (should (length= browse-url-handlers 1))
      (transient-mark-mode +1)
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -302,6 +310,7 @@ a `default-directory' equal to this temporary test directory."
            '(("\\`http" . (lambda (url &rest args)
                             (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/main/elsewhere.el"
                                            url)))))))
+     (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t)))
   (elsewhere--test-with-repo
    'Git
@@ -313,6 +322,7 @@ a `default-directory' equal to this temporary test directory."
            '(("\\`http" . (lambda (url &rest args)
                             (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/main/elsewhere.el"
                                            url)))))))
+     (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t)))
   (elsewhere--test-with-repo
    'Git
@@ -324,6 +334,7 @@ a `default-directory' equal to this temporary test directory."
            '(("\\`http" . (lambda (url &rest args)
                             (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el"
                                            url)))))))
+     (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t)))
   (elsewhere--test-with-repo
    'Git
@@ -335,6 +346,7 @@ a `default-directory' equal to this temporary test directory."
            '(("\\`http" . (lambda (url &rest args)
                             (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el"
                                            url)))))))
+     (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t)))
   (elsewhere--test-with-repo
    'Git
@@ -347,6 +359,7 @@ a `default-directory' equal to this temporary test directory."
            '(("\\`http" . (lambda (url &rest args)
                             (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2-L5"
                                            url)))))))
+     (should (length= browse-url-handlers 1))
      (transient-mark-mode +1)
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -367,6 +380,7 @@ a `default-directory' equal to this temporary test directory."
            '(("\\`http" . (lambda (url &rest args)
                             (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2-L5"
                                            url)))))))
+     (should (length= browse-url-handlers 1))
      (transient-mark-mode +1)
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -387,6 +401,7 @@ a `default-directory' equal to this temporary test directory."
            '(("\\`http" . (lambda (url &rest args)
                             (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2"
                                            url)))))))
+     (should (length= browse-url-handlers 1))
      (transient-mark-mode +1)
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -406,6 +421,7 @@ a `default-directory' equal to this temporary test directory."
            '(("\\`http" . (lambda (url &rest args)
                             (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2"
                                            url)))))))
+     (should (length= browse-url-handlers 1))
      (transient-mark-mode +1)
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
