@@ -201,7 +201,7 @@ Also, trim the .git suffix from the end of the repository name."
   (string-remove-suffix elsewhere-dot-git-suffix (elsewhere--get-git-repo-dot-git-path regexps remote)))
 
 (defun elsewhere--build-url-git-github (remote rev path &optional top bottom)
-  "Build the URL for the PATH at commit REV from REMOTE on GitHub.
+  "Build URL for PATH at commit REV from REMOTE on GitHub.
 If the line numbers TOP and BOTTOM are provided, then the region
 delineated by those line numbers will be incorporated into the URL."
   (let* ((repo (elsewhere--get-git-repo-path elsewhere-host-regexps-github remote))
@@ -211,7 +211,7 @@ delineated by those line numbers will be incorporated into the URL."
       base)))
 
 (defun elsewhere--build-url-git-gitlab (remote rev path &optional top bottom)
-  "Build the URL for the PATH at commit REV from REMOTE on GitLab.
+  "Build URL for PATH at commit REV from REMOTE on GitLab.
 If the line numbers TOP and BOTTOM are provided, then the region
 delineated by those line numbers will be incorporated into the URL."
   (let* ((repo (elsewhere--get-git-repo-path elsewhere-host-regexps-gitlab remote))
