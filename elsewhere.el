@@ -109,8 +109,24 @@
   :type '(repeat string)
   :group 'convenience)
 
+(defcustom elsewhere-host-regexp-sourcehut-http "^https?://git.sr.ht/"
+  "Regexp for matching the host in a Sourcehut HTTP remote URL."
+  :type 'string
+  :group 'convenience)
+
+(defcustom elsewhere-host-regexp-sourcehut-ssh "^git@git.sr.ht:"
+  "Regexp for matching the host in a Sourcehut SSH remote URL."
+  :type 'string
+  :group 'convenience)
+
+(defcustom elsewhere-host-regexps-sourcehut `(,elsewhere-host-regexp-sourcehut-http ,elsewhere-host-regexp-sourcehut-ssh)
+  "Regexps for matching the host in a Sourcehut remote URL."
+  :type '(repeat string)
+  :group 'convenience)
+
 (defcustom elsewhere-recognized-remotes-git `((,elsewhere-host-regexps-github . elsewhere--build-url-git-github)
-                                              (,elsewhere-host-regexps-gitlab . elsewhere--build-url-git-gitlab))
+                                              (,elsewhere-host-regexps-gitlab . elsewhere--build-url-git-gitlab)
+                                              (,elsewhere-host-regexps-sourcehut . elsewhere--build-url-git-sourcehut))
   "Maps supported `Git' remote URLs to URL builders."
   :type '(alist :key-type (repeat string)
                 :value-type function)
@@ -218,6 +234,16 @@ delineated by those line numbers will be incorporated into the URL."
          (base (format "https://gitlab.com/%s/-/blob/%s/%s" repo rev path)))
     (if (and top bottom) (if (not (eq top bottom)) (format "%s#L%d-L%d" base top bottom)
                           (format "%s#L%d" base top))
+      base)))
+
+(defun elsewhere--build-url-git-sourcehut (remote rev path &optional top bottom)
+  "Build URL for PATH at commit REV from REMOTE on Sourcehut.
+If the line numbers TOP and BOTTOM are provided, then the region
+delineated by those line numbers will be incorporated into the URL."
+  (let* ((repo (elsewhere--get-git-repo-path elsewhere-host-regexps-sourcehut remote))
+         (base (format "https://git.sr.ht/%s/tree/%s/item/%s" repo rev path)))
+    (if (and top bottom) (if (not (eq top bottom)) (format "%s#L%d-%d" base top bottom)
+                           (format "%s#L%d" base top))
       base)))
 
 (defun elsewhere--choose-git-revision-interactively (default)

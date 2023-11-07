@@ -28,7 +28,9 @@ URL in your echo area.
 
 ## Requirements
 
-- Emacs version 29.1 or newer
+> [!IMPORTANT]
+> Currently, `elsewhere.el` requires Emacs version `29.1` or newer.
+> You can check your Emacs version by typing `M-x emacs-version`.
 
 ## Currently-Supported VC Backends
 
@@ -36,3 +38,4 @@ URL in your echo area.
 
 - [GitHub](https://github.com/)
 - [GitLab](https://gitlab.com/)
+- [Sourcehut](https://git.sr.ht/)

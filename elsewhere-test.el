@@ -429,6 +429,136 @@ a `default-directory' equal to this temporary test directory."
      (forward-char)
      (should (equal 2 (line-number-at-pos (mark))))
      (should (use-region-p))
+     (elsewhere-open nil nil nil t)))
+  (elsewhere--test-with-repo
+   'Git
+   (make-elsewhere--test-repo-spec-git
+    :remote "https://git.sr.ht/~wgn/elsewhere"
+    :branch "main"
+    :test-file-name "elsewhere.el")
+   (let* ((browse-url-handlers
+           '(("\\`http" . (lambda (url &rest args)
+                            (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/main/item/elsewhere.el"
+                                           url)))))))
+     (should (length= browse-url-handlers 1))
+     (elsewhere-open nil nil nil t)))
+  (elsewhere--test-with-repo
+   'Git
+   (make-elsewhere--test-repo-spec-git
+    :remote "git@git.sr.ht:~wgn/elsewhere"
+    :branch "main"
+    :test-file-name "elsewhere.el")
+   (let* ((browse-url-handlers
+           '(("\\`http" . (lambda (url &rest args)
+                            (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/main/item/elsewhere.el"
+                                           url)))))))
+     (should (length= browse-url-handlers 1))
+     (elsewhere-open nil nil nil t)))
+  (elsewhere--test-with-repo
+   'Git
+   (make-elsewhere--test-repo-spec-git
+    :remote "https://git.sr.ht/~wgn/elsewhere"
+    :branch "c64ad3953dfbd7bbf23d36fe302b1e54112022d1"
+    :test-file-name "elsewhere.el")
+   (let* ((browse-url-handlers
+           '(("\\`http" . (lambda (url &rest args)
+                            (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/item/elsewhere.el"
+                                           url)))))))
+     (should (length= browse-url-handlers 1))
+     (elsewhere-open nil nil nil t)))
+  (elsewhere--test-with-repo
+   'Git
+   (make-elsewhere--test-repo-spec-git
+    :remote "git@git.sr.ht:~wgn/elsewhere"
+    :branch "c64ad3953dfbd7bbf23d36fe302b1e54112022d1"
+    :test-file-name "elsewhere.el")
+   (let* ((browse-url-handlers
+           '(("\\`http" . (lambda (url &rest args)
+                            (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/item/elsewhere.el"
+                                           url)))))))
+     (should (length= browse-url-handlers 1))
+     (elsewhere-open nil nil nil t)))
+  (elsewhere--test-with-repo
+   'Git
+   (make-elsewhere--test-repo-spec-git
+    :remote "https://git.sr.ht/~wgn/elsewhere"
+    :branch "c64ad3953dfbd7bbf23d36fe302b1e54112022d1"
+    :test-file-name "elsewhere.el"
+    :test-file-contents "1\n2\n3\n4\n5\n6\n7")
+   (let* ((browse-url-handlers
+           '(("\\`http" . (lambda (url &rest args)
+                            (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/item/elsewhere.el#L2-5"
+                                           url)))))))
+     (should (length= browse-url-handlers 1))
+     (transient-mark-mode +1)
+     (forward-line)
+     (should (equal 2 (line-number-at-pos)))
+     (push-mark nil t t)
+     (forward-line 3)
+     (should (equal 5 (line-number-at-pos)))
+     (should (equal 2 (line-number-at-pos (mark))))
+     (should (use-region-p))
+     (elsewhere-open nil nil nil t)))
+  (elsewhere--test-with-repo
+   'Git
+   (make-elsewhere--test-repo-spec-git
+    :remote "git@git.sr.ht:~wgn/elsewhere"
+    :branch "c64ad3953dfbd7bbf23d36fe302b1e54112022d1"
+    :test-file-name "elsewhere.el"
+    :test-file-contents "1\n2\n3\n4\n5\n6\n7")
+   (let* ((browse-url-handlers
+           '(("\\`http" . (lambda (url &rest args)
+                            (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/item/elsewhere.el#L2-5"
+                                           url)))))))
+     (should (length= browse-url-handlers 1))
+     (transient-mark-mode +1)
+     (forward-line)
+     (should (equal 2 (line-number-at-pos)))
+     (push-mark nil t t)
+     (forward-line 3)
+     (should (equal 5 (line-number-at-pos)))
+     (should (equal 2 (line-number-at-pos (mark))))
+     (should (use-region-p))
+     (elsewhere-open nil nil nil t)))
+  (elsewhere--test-with-repo
+   'Git
+   (make-elsewhere--test-repo-spec-git
+    :remote "https://git.sr.ht/~wgn/elsewhere"
+    :branch "c64ad3953dfbd7bbf23d36fe302b1e54112022d1"
+    :test-file-name "elsewhere.el"
+    :test-file-contents "1\n2\n3\n4\n5\n6\n7")
+   (let* ((browse-url-handlers
+           '(("\\`http" . (lambda (url &rest args)
+                            (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/item/elsewhere.el#L2"
+                                           url)))))))
+     (should (length= browse-url-handlers 1))
+     (transient-mark-mode +1)
+     (forward-line)
+     (should (equal 2 (line-number-at-pos)))
+     (push-mark nil t t)
+     (forward-char)
+     (should (equal 2 (line-number-at-pos (mark))))
+     (should (use-region-p))
+     (elsewhere-open nil nil nil t)))
+  (elsewhere--test-with-repo
+   'Git
+   (make-elsewhere--test-repo-spec-git
+    :remote "git@git.sr.ht:~wgn/elsewhere"
+    :branch "c64ad3953dfbd7bbf23d36fe302b1e54112022d1"
+    :test-file-name "elsewhere.el"
+    :test-file-contents "1\n2\n3\n4\n5\n6\n7")
+   (let* ((browse-url-handlers
+           '(("\\`http" . (lambda (url &rest args)
+                            (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/item/elsewhere.el#L2"
+                                           url)))))))
+     (should (length= browse-url-handlers 1))
+     (transient-mark-mode +1)
+     (forward-line)
+     (should (equal 2 (line-number-at-pos)))
+     (push-mark nil t t)
+     (forward-char)
+     (should (equal 2 (line-number-at-pos (mark))))
+     (should (use-region-p))
      (elsewhere-open nil nil nil t))))
 
 (provide 'elsewhere-test)
