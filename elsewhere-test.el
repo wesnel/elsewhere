@@ -6,8 +6,8 @@
 ;; Maintainer: Wesley Nelson <wgn@wesnel.dev>
 ;; Created: 23 Jul 2023
 
-;; Version: 1.2.1
-;; Package-Requires: ((emacs "29.1") (elsewhere "1.2.1"))
+;; Version: 1.3.0
+;; Package-Requires: ((emacs "29.1") (elsewhere "1.3.0"))
 
 ;; Keywords: convenience
 
@@ -47,7 +47,7 @@
 Don't set it globally; the functions should be let-bound.")
 
 (cl-defstruct elsewhere--test-repo-spec-git
-  "Used for initializing data in a Git repo."
+  "Used for initializing data in a `Git' repo."
   remote
   branch
   test-file-name

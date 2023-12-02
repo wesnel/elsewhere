@@ -6,7 +6,7 @@
 ;; Maintainer: Wesley Nelson <wgn@wesnel.dev>
 ;; Created: 24 Jul 2023
 
-;; Version: 1.2.1
+;; Version: 1.3.0
 ;; Package-Requires: ((emacs "29.1"))
 
 ;; Keywords: convenience
@@ -38,6 +38,9 @@
 ;; elsewhere-open.  You should see a webpage open in your browser.
 
 ;;; Change Log:
+
+;; 2023-12-01 - v1.3.0
+;; * Add ability to select a remote.
 
 ;; 2023-12-01 - v1.2.1
 ;; * Improve logic for selecting a Git revision.
@@ -170,7 +173,7 @@ the URL.  Otherwise, START and END will default to the
 currently-selected region (if any).  If HEADLESS? is non-nil,
 then do not prompt for user input."
   (interactive)
-  (let* ((url (elsewhere-build-url buffer start end t headless?)))
+  (let ((url (elsewhere-build-url buffer start end t headless?)))
     (browse-url url)))
 
 ;;;###autoload
@@ -184,7 +187,7 @@ currently-selected region (if any).  If SILENT? is non-nil, then
 suppress the writing of the URL to the echo area.  If HEADLESS?
 is non-nil, then do not prompt for user input."
   (interactive)
-  (let* ((buffer (or buffer (current-buffer))))
+  (let ((buffer (or buffer (current-buffer))))
     (with-current-buffer buffer
       (save-mark-and-excursion
         (let* ((use-region (unless (and start end) (use-region-p)))
@@ -209,25 +212,24 @@ is non-nil, then do not prompt for user input."
 
 (defun elsewhere--build-url-git (file top bottom &optional headless?)
   "Build the URL for the FILE on a `Git' remote.
-If the line numbers TOP and BOTTOM are provided, then the region
-delineated by those line numbers will be incorporated into the
-URL.  If HEADLESS? is non-nil, then the Git revision will be the
-current revision of the current buffer.  Otherwise, the Git
-revision will be chosen using `completing-read'."
-  (let* ((remote (condition-case nil
-                     (vc-git-repository-url file)
-                   (error (user-error "The Git remote is not configured in this directory"))))
+It is assumed that FILE is open in the current buffer.  If the line
+numbers TOP and BOTTOM are provided, then the region delineated by
+those line numbers will be incorporated into the URL.  If HEADLESS? is
+non-nil, then the `Git' revision will be the current revision of the
+current buffer.  Otherwise, the `Git' revision will be chosen using
+`completing-read'."
+  (let* ((remote (elsewhere--choose-git-remote file headless?))
          (pairing (assoc remote elsewhere-recognized-remotes-git 'elsewhere--is-matching-any-remote?))
          (rev (elsewhere--choose-git-revision file headless?))
          (path (file-relative-name file (vc-root-dir))))
     (if (not pairing) (user-error "This Git remote is not supported")
-      (let* ((builder (cdr pairing)))
+      (let ((builder (cdr pairing)))
         (funcall builder remote rev path top bottom)))))
 
 (defun elsewhere--get-git-repo-dot-git-path (regexps remote)
   "Use REGEXPS to trim the host information off of REMOTE."
   (if (null regexps) remote
-    (let* ((regexp (car regexps)))
+    (let ((regexp (car regexps)))
       (replace-regexp-in-string regexp "" (elsewhere--get-git-repo-dot-git-path (cdr regexps) remote)))))
 
 (defun elsewhere--get-git-repo-path (regexps remote)
@@ -271,11 +273,44 @@ delineated by those line numbers will be incorporated into the URL."
           (format "%s#L%d" base top))
       base)))
 
+(defun elsewhere--choose-git-remote (file &optional headless?)
+  "Choose the `Git' remote to use for FILE.
+If HEADLESS? is non-nil, then the `Git' remote will be the
+default for this file.  Otherwise, the `Git' remote will be
+chosen using `completing-read'."
+  (let ((choices (elsewhere--list-remotes-git file)))
+    (when (not choices)
+      (user-error "No Git remote configured for file: %s" file))
+    (if headless?
+        (cdr (car choices))
+      (cdr (assoc (elsewhere--choose-remote-interactively
+                   (mapcar (lambda (pair) (car pair)) choices)
+                   (car (car choices)))
+                  choices)))))
+
+;; FIXME: `vc' should have this function, if they don't already.
+(defun elsewhere--list-remotes-git (file)
+  "Construct an alist of `Git' remote names and URLs for FILE.
+It is assumed that FILE is open in the current buffer."
+  (let ((default-directory (vc-git-root file)))
+    (with-temp-buffer
+      (vc-git-command (current-buffer) 0 nil "remote")
+      (mapcar (lambda (remote-name)
+                `(,remote-name . ,(vc-git-repository-url file remote-name)))
+              (split-string (buffer-string))))))
+
+(defun elsewhere--choose-remote-interactively (choices &optional default)
+  "Use `completing-read' to choose a remote among CHOICES.
+If provided, DEFAULT is the default choice to use if nothing else
+is selected or entered by the user."
+  (elsewhere--choose-interactively "Choose remote" choices default))
+
 (defun elsewhere--choose-git-revision (file &optional headless?)
-  "Choose the Git revision to use for FILE.
-If HEADLESS? is non-nil, then the Git revision will be the
-current revision of the current buffer.  Otherwise, the Git
-revision will be chosen using `completing-read'."
+  "Choose the `Git' revision to use for FILE.
+It is assumed that FILE is open in the current buffer.  If HEADLESS?
+is non-nil, then the `Git' revision will be the current revision of
+the current buffer.  Otherwise, the `Git' revision will be chosen
+using `completing-read'."
   (let* ((found-branches (vc-git-branches))
          (no-branches? (or (length= found-branches 0)
                            (and (length= found-branches 1)
@@ -296,7 +331,7 @@ revision will be chosen using `completing-read'."
       (elsewhere--choose-revision-interactively choices default))))
 
 (defun elsewhere--get-current-ref ()
-  "Use the Git symbolic-ref command to get the current ref on HEAD."
+  "Use the `Git' symbolic-ref command to get the current ref on HEAD."
   (let* ((ref-output
           (with-output-to-string
             (with-current-buffer standard-output
@@ -309,10 +344,22 @@ revision will be chosen using `completing-read'."
     current-ref))
 
 (defun elsewhere--choose-revision-interactively (choices &optional default)
-  "Use `completing-read' to choose among CHOICES.
+  "Use `completing-read' to choose a revision among CHOICES.
 If provided, DEFAULT is the default choice to use if nothing else
 is selected or entered by the user."
-  (completing-read (format "Choose revision (default %s):" default)
+  (elsewhere--choose-interactively "Choose revision" choices default))
+
+(defun elsewhere--choose-interactively (prompt choices &optional default)
+  "Use `completing-read' to choose among CHOICES.
+PROMPT is the prompting text which will be displayed to the user.
+This function will handle adding a trailing semicolon to PROMPT, so exclude
+that from PROMPT.  If provided, DEFAULT is the default choice to
+use if nothing else is selected or entered by the user.  This
+ function will handle adding information about the DEFAULT to the
+ PROMPT, so exclude that from PROMPT as well."
+  (completing-read (if default
+                       (format "%s (default %s): " prompt default)
+                     (format "%s:" prompt))
                    choices
                    nil
                    nil
