@@ -184,7 +184,7 @@ a `default-directory' equal to this temporary test directory."
             (message "Created repo with backend: %s" ,backend)
 
             (message "Initializing test data in repo")
-            (let* ((tmp-buff (elsewhere--test-initialize-repo ,spec)))
+            (let ((tmp-buff (elsewhere--test-initialize-repo ,spec)))
               (with-current-buffer tmp-buff
                 (message "Executing test body in buffer: %s" tmp-buff)
                 ,@body
@@ -202,7 +202,7 @@ don't match, then the function will return nil.  After all
 REGEXPS have been matched and removed, the remaining text left
 over will be checked to see if it appears to be in the format of
 a SHA hash."
-  (let* ((regexp (car regexps)))
+  (let ((regexp (car regexps)))
     (if regexp
         (progn
           (message "Checking regexp: %s" regexp)
@@ -222,10 +222,10 @@ a SHA hash."
    (make-elsewhere--test-repo-spec-git
     :branch "branch"
     :test-file-name "elsewhere.el")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (ert-fail "Bad URL was opened"))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (ert-fail "Bad URL was opened"))))))
      (should (length= browse-url-handlers 1))
      (should-error
       (elsewhere-open nil nil nil t)
@@ -238,10 +238,10 @@ a SHA hash."
     :remote "https://example.com/wesnel/elsewhere.git"
     :branch "branch"
     :test-file-name "elsewhere.el")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (ert-fail "Bad URL was opened"))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (ert-fail "Bad URL was opened"))))))
      (should (length= browse-url-handlers 1))
      (should-error
       (elsewhere-open nil nil nil t)
@@ -254,11 +254,11 @@ a SHA hash."
     :remote "https://github.com/wesnel/elsewhere.git"
     :branch "branch"
     :test-file-name "elsewhere.el")
-   (let* ((elsewhere-recognized-backends nil)
-          (browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (ert-fail "Bad URL was opened"))))))
+   (let ((elsewhere-recognized-backends nil)
+         (browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (ert-fail "Bad URL was opened"))))))
      (should (length= browse-url-handlers 1))
      (should-error
       (elsewhere-open nil nil nil t)
@@ -272,11 +272,11 @@ a SHA hash."
     :branch "branch"
     :test-file-name "elsewhere.el"
     :test-file-contents "1\n2\n3\n4\n5\n6\n7")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (equal "https://github.com/wesnel/elsewhere/blob/branch/elsewhere.el#L2-L5"
-                                 url)))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (equal "https://github.com/wesnel/elsewhere/blob/branch/elsewhere.el#L2-L5"
+                                url)))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -284,8 +284,8 @@ a SHA hash."
      (forward-line 3)
      (should (equal 5 (line-number-at-pos)))
      (should (equal 2 (line-number-at-pos (mark))))
-     (let* ((start (region-beginning))
-            (end (region-end)))
+     (let ((start (region-beginning))
+           (end (region-end)))
        (deactivate-mark)
        (should (not (use-region-p)))
        (should (equal 2 (line-number-at-pos start)))
@@ -300,11 +300,11 @@ a SHA hash."
     :branch "branch"
     :test-file-name "elsewhere.el"
     :test-file-contents "1\n2\n3\n4\n5\n6\n7")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (equal "https://github.com/wesnel/elsewhere/blob/branch/elsewhere.el"
-                                 url)))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (equal "https://github.com/wesnel/elsewhere/blob/branch/elsewhere.el"
+                                url)))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -312,7 +312,7 @@ a SHA hash."
      (forward-line 3)
      (should (equal 5 (line-number-at-pos)))
      (should (equal 2 (line-number-at-pos (mark))))
-     (let* ((start (region-beginning)))
+     (let ((start (region-beginning)))
        (deactivate-mark)
        (should (not (use-region-p)))
        (elsewhere-open nil start nil t)))))
@@ -324,11 +324,11 @@ a SHA hash."
     :remote "https://github.com/wesnel/elsewhere.git"
     :branch "branch"
     :test-file-name "elsewhere.el")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (equal "https://github.com/wesnel/elsewhere/blob/branch/elsewhere.el"
-                                 url)))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (equal "https://github.com/wesnel/elsewhere/blob/branch/elsewhere.el"
+                                url)))))))
      (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t))))
 
@@ -339,11 +339,11 @@ a SHA hash."
     :remote "git@github.com:wesnel/elsewhere.git"
     :branch "branch"
     :test-file-name "elsewhere.el")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (equal "https://github.com/wesnel/elsewhere/blob/branch/elsewhere.el"
-                                 url)))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (equal "https://github.com/wesnel/elsewhere/blob/branch/elsewhere.el"
+                                url)))))))
      (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t))))
 
@@ -354,15 +354,43 @@ a SHA hash."
     :remote "https://github.com/wesnel/elsewhere.git"
     :test-file-name "elsewhere.el"
     :commit "message")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (elsewhere--test-contains-hash?
-                           url
-                           (rx line-start "https://github.com/wesnel/elsewhere/blob/")
-                           (rx "/elsewhere.el" line-end))))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (elsewhere--test-contains-hash?
+                          url
+                          (rx line-start "https://github.com/wesnel/elsewhere/blob/")
+                          (rx "/elsewhere.el" line-end))))))))
      (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t))))
+
+(ert-deftest elsewhere--test-elsewhere-open-github-http-rev-interactive ()
+ (elsewhere--test-with-repo
+  'Git
+  (make-elsewhere--test-repo-spec-git
+   :remote "https://github.com/wesnel/elsewhere.git"
+   :test-file-name "elsewhere.el"
+   :commit "message")
+  (let ((completing-read-function
+         (lambda (_prompt
+                  _collection
+                  &optional
+                  _predicate
+                  _require-match
+                  _initial-input
+                  _hist
+                  def
+                  _inherit-input-method)
+           def))
+        (browse-url-handlers
+         '(("\\`http"
+            . (lambda (url &rest args)
+                (should (elsewhere--test-contains-hash?
+                         url
+                         (rx line-start "https://github.com/wesnel/elsewhere/blob/")
+                         (rx "/elsewhere.el" line-end))))))))
+    (should (length= browse-url-handlers 1))
+    (elsewhere-open nil nil nil))))
 
 (ert-deftest elsewhere--test-elsewhere-open-github-ssh-rev ()
   (elsewhere--test-with-repo
@@ -371,13 +399,13 @@ a SHA hash."
     :remote "git@github.com:wesnel/elsewhere.git"
     :test-file-name "elsewhere.el"
     :commit "message")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (elsewhere--test-contains-hash?
-                           url
-                           (rx line-start "https://github.com/wesnel/elsewhere/blob/")
-                           (rx "/elsewhere.el" line-end))))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (elsewhere--test-contains-hash?
+                          url
+                          (rx line-start "https://github.com/wesnel/elsewhere/blob/")
+                          (rx "/elsewhere.el" line-end))))))))
      (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t))))
 
@@ -389,13 +417,13 @@ a SHA hash."
     :test-file-name "elsewhere.el"
     :test-file-contents "1\n2\n3\n4\n5\n6\n7"
     :commit "message")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (elsewhere--test-contains-hash?
-                           url
-                           (rx line-start "https://github.com/wesnel/elsewhere/blob/")
-                           (rx "/elsewhere.el#L2-L5" line-end))))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (elsewhere--test-contains-hash?
+                          url
+                          (rx line-start "https://github.com/wesnel/elsewhere/blob/")
+                          (rx "/elsewhere.el#L2-L5" line-end))))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -414,13 +442,13 @@ a SHA hash."
     :test-file-name "elsewhere.el"
     :test-file-contents "1\n2\n3\n4\n5\n6\n7"
     :commit "message")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (elsewhere--test-contains-hash?
-                           url
-                           (rx line-start "https://github.com/wesnel/elsewhere/blob/")
-                           (rx "/elsewhere.el#L2-L5" line-end))))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (elsewhere--test-contains-hash?
+                          url
+                          (rx line-start "https://github.com/wesnel/elsewhere/blob/")
+                          (rx "/elsewhere.el#L2-L5" line-end))))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -439,13 +467,13 @@ a SHA hash."
     :test-file-name "elsewhere.el"
     :test-file-contents "1\n2\n3\n4\n5\n6\n7"
     :commit "message")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (elsewhere--test-contains-hash?
-                           url
-                           (rx line-start "https://github.com/wesnel/elsewhere/blob/")
-                           (rx "/elsewhere.el#L2" line-end))))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (elsewhere--test-contains-hash?
+                          url
+                          (rx line-start "https://github.com/wesnel/elsewhere/blob/")
+                          (rx "/elsewhere.el#L2" line-end))))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -463,13 +491,13 @@ a SHA hash."
     :test-file-name "elsewhere.el"
     :test-file-contents "1\n2\n3\n4\n5\n6\n7"
     :commit "message")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (elsewhere--test-contains-hash?
-                           url
-                           (rx line-start "https://github.com/wesnel/elsewhere/blob/")
-                           (rx "/elsewhere.el#L2" line-end))))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (elsewhere--test-contains-hash?
+                          url
+                          (rx line-start "https://github.com/wesnel/elsewhere/blob/")
+                          (rx "/elsewhere.el#L2" line-end))))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -486,11 +514,11 @@ a SHA hash."
     :remote "https://gitlab.com/wesnel/elsewhere.git"
     :branch "branch"
     :test-file-name "elsewhere.el")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/branch/elsewhere.el"
-                                 url)))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/branch/elsewhere.el"
+                                url)))))))
      (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t))))
 
@@ -501,11 +529,11 @@ a SHA hash."
     :remote "git@gitlab.com:wesnel/elsewhere.git"
     :branch "branch"
     :test-file-name "elsewhere.el")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/branch/elsewhere.el"
-                                 url)))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/branch/elsewhere.el"
+                                url)))))))
      (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t))))
 
@@ -516,13 +544,13 @@ a SHA hash."
     :remote "https://gitlab.com/wesnel/elsewhere.git"
     :test-file-name "elsewhere.el"
     :commit "message")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (elsewhere--test-contains-hash?
-                           url
-                           (rx line-start "https://gitlab.com/wesnel/elsewhere/-/blob/")
-                           (rx "/elsewhere.el" line-end))))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (elsewhere--test-contains-hash?
+                          url
+                          (rx line-start "https://gitlab.com/wesnel/elsewhere/-/blob/")
+                          (rx "/elsewhere.el" line-end))))))))
      (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t))))
 
@@ -533,13 +561,13 @@ a SHA hash."
     :remote "git@gitlab.com:wesnel/elsewhere.git"
     :test-file-name "elsewhere.el"
     :commit "message")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (elsewhere--test-contains-hash?
-                           url
-                           (rx line-start "https://gitlab.com/wesnel/elsewhere/-/blob/")
-                           (rx "/elsewhere.el" line-end))))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (elsewhere--test-contains-hash?
+                          url
+                          (rx line-start "https://gitlab.com/wesnel/elsewhere/-/blob/")
+                          (rx "/elsewhere.el" line-end))))))))
      (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t))))
 
@@ -551,13 +579,13 @@ a SHA hash."
     :test-file-name "elsewhere.el"
     :test-file-contents "1\n2\n3\n4\n5\n6\n7"
     :commit "message")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (elsewhere--test-contains-hash?
-                           url
-                           (rx line-start "https://gitlab.com/wesnel/elsewhere/-/blob/")
-                           (rx "/elsewhere.el#L2-L5" line-end))))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (elsewhere--test-contains-hash?
+                          url
+                          (rx line-start "https://gitlab.com/wesnel/elsewhere/-/blob/")
+                          (rx "/elsewhere.el#L2-L5" line-end))))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -576,13 +604,13 @@ a SHA hash."
     :test-file-name "elsewhere.el"
     :test-file-contents "1\n2\n3\n4\n5\n6\n7"
     :commit "message")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (elsewhere--test-contains-hash?
-                           url
-                           (rx line-start "https://gitlab.com/wesnel/elsewhere/-/blob/")
-                           (rx "/elsewhere.el#L2-L5" line-end))))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (elsewhere--test-contains-hash?
+                          url
+                          (rx line-start "https://gitlab.com/wesnel/elsewhere/-/blob/")
+                          (rx "/elsewhere.el#L2-L5" line-end))))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -601,13 +629,13 @@ a SHA hash."
     :test-file-name "elsewhere.el"
     :test-file-contents "1\n2\n3\n4\n5\n6\n7"
     :commit "message")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (elsewhere--test-contains-hash?
-                           url
-                           (rx line-start "https://gitlab.com/wesnel/elsewhere/-/blob/")
-                           (rx "/elsewhere.el#L2" line-end))))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (elsewhere--test-contains-hash?
+                          url
+                          (rx line-start "https://gitlab.com/wesnel/elsewhere/-/blob/")
+                          (rx "/elsewhere.el#L2" line-end))))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -625,13 +653,13 @@ a SHA hash."
     :test-file-name "elsewhere.el"
     :test-file-contents "1\n2\n3\n4\n5\n6\n7"
     :commit "message")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (elsewhere--test-contains-hash?
-                           url
-                           (rx line-start "https://gitlab.com/wesnel/elsewhere/-/blob/")
-                           (rx "/elsewhere.el#L2" line-end))))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (elsewhere--test-contains-hash?
+                          url
+                          (rx line-start "https://gitlab.com/wesnel/elsewhere/-/blob/")
+                          (rx "/elsewhere.el#L2" line-end))))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -648,11 +676,11 @@ a SHA hash."
     :remote "https://git.sr.ht/~wgn/elsewhere"
     :branch "branch"
     :test-file-name "elsewhere.el")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/branch/item/elsewhere.el"
-                                 url)))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/branch/item/elsewhere.el"
+                                url)))))))
      (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t))))
 
@@ -663,11 +691,11 @@ a SHA hash."
     :remote "git@git.sr.ht:~wgn/elsewhere"
     :branch "branch"
     :test-file-name "elsewhere.el")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/branch/item/elsewhere.el"
-                                 url)))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/branch/item/elsewhere.el"
+                                url)))))))
      (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t))))
 
@@ -678,13 +706,13 @@ a SHA hash."
     :remote "https://git.sr.ht/~wgn/elsewhere"
     :test-file-name "elsewhere.el"
     :commit "message")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (elsewhere--test-contains-hash?
-                           url
-                           (rx line-start "https://git.sr.ht/~wgn/elsewhere/tree/")
-                           (rx "/item/elsewhere.el" line-end))))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (elsewhere--test-contains-hash?
+                          url
+                          (rx line-start "https://git.sr.ht/~wgn/elsewhere/tree/")
+                          (rx "/item/elsewhere.el" line-end))))))))
      (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t))))
 
@@ -695,13 +723,13 @@ a SHA hash."
     :remote "git@git.sr.ht:~wgn/elsewhere"
     :test-file-name "elsewhere.el"
     :commit "message")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (elsewhere--test-contains-hash?
-                           url
-                           (rx line-start "https://git.sr.ht/~wgn/elsewhere/tree/")
-                           (rx "/item/elsewhere.el" line-end))))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (elsewhere--test-contains-hash?
+                          url
+                          (rx line-start "https://git.sr.ht/~wgn/elsewhere/tree/")
+                          (rx "/item/elsewhere.el" line-end))))))))
      (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t))))
 
@@ -713,13 +741,13 @@ a SHA hash."
     :test-file-name "elsewhere.el"
     :test-file-contents "1\n2\n3\n4\n5\n6\n7"
     :commit "message")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (elsewhere--test-contains-hash?
-                           url
-                           (rx line-start "https://git.sr.ht/~wgn/elsewhere/tree/")
-                           (rx "/item/elsewhere.el#L2-5" line-end))))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (elsewhere--test-contains-hash?
+                          url
+                          (rx line-start "https://git.sr.ht/~wgn/elsewhere/tree/")
+                          (rx "/item/elsewhere.el#L2-5" line-end))))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -738,13 +766,13 @@ a SHA hash."
     :test-file-name "elsewhere.el"
     :test-file-contents "1\n2\n3\n4\n5\n6\n7"
     :commit "message")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (elsewhere--test-contains-hash?
-                           url
-                           (rx line-start "https://git.sr.ht/~wgn/elsewhere/tree/")
-                           (rx "/item/elsewhere.el#L2-5" line-end))))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (elsewhere--test-contains-hash?
+                          url
+                          (rx line-start "https://git.sr.ht/~wgn/elsewhere/tree/")
+                          (rx "/item/elsewhere.el#L2-5" line-end))))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -763,13 +791,13 @@ a SHA hash."
     :test-file-name "elsewhere.el"
     :test-file-contents "1\n2\n3\n4\n5\n6\n7"
     :commit "message")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (elsewhere--test-contains-hash?
-                           url
-                           (rx line-start "https://git.sr.ht/~wgn/elsewhere/tree/")
-                           (rx "/item/elsewhere.el#L2" line-end))))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (elsewhere--test-contains-hash?
+                          url
+                          (rx line-start "https://git.sr.ht/~wgn/elsewhere/tree/")
+                          (rx "/item/elsewhere.el#L2" line-end))))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -787,13 +815,13 @@ a SHA hash."
     :test-file-name "elsewhere.el"
     :test-file-contents "1\n2\n3\n4\n5\n6\n7"
     :commit "message")
-   (let* ((browse-url-handlers
-           '(("\\`http"
-              . (lambda (url &rest args)
-                  (should (elsewhere--test-contains-hash?
-                           url
-                           (rx line-start "https://git.sr.ht/~wgn/elsewhere/tree/")
-                           (rx "/item/elsewhere.el#L2" line-end))))))))
+   (let ((browse-url-handlers
+          '(("\\`http"
+             . (lambda (url &rest args)
+                 (should (elsewhere--test-contains-hash?
+                          url
+                          (rx line-start "https://git.sr.ht/~wgn/elsewhere/tree/")
+                          (rx "/item/elsewhere.el#L2" line-end))))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
