@@ -70,6 +70,10 @@ Returns a buffer inside the repo."
                     (elsewhere--test-repo-spec-git-test-file-name spec)
                     default-directory))
          (tmp-buff (find-file tmp-name))
+         (process-environment (append '("EMAIL=wgn@example.com"
+                                        "GIT_AUTHOR_NAME=wgn"
+                                        "GIT_COMMITTER_NAME=wgn")
+                                      process-environment))
          (tmp-contents (elsewhere--test-repo-spec-git-test-file-contents spec))
          (remote (elsewhere--test-repo-spec-git-remote spec))
          (branch (elsewhere--test-repo-spec-git-branch spec))
