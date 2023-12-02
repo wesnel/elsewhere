@@ -32,10 +32,14 @@
 
 ;;; Code:
 
+(eval-when-compile
+  (require 'rx))
+
 (require 'cl-generic)
 (require 'elsewhere)
 (require 'ert)
 (require 'ert-x)
+(require 'log-edit)
 (require 'vc)
 
 (defvar elsewhere--test-cleanup-hook nil
@@ -47,14 +51,18 @@ Don't set it globally; the functions should be let-bound.")
   remote
   branch
   test-file-name
-  test-file-contents)
+  test-file-contents
+  commit)
 
-(cl-defgeneric elsehwere--test-initialize-repo (spec)
+(cl-defgeneric elsewhere--test-initialize-repo (spec)
   "Use SPEC to init data in a VC repo in `default-directory'.
 Returns a buffer inside the repo.")
 
+(cl-defgeneric elsewhere--test-destroy-repo (spec)
+  "Use SPEC to destroy data in a VC repo in `default-directory'.")
+
 (cl-defmethod elsewhere--test-initialize-repo ((spec elsewhere--test-repo-spec-git))
-  "Use SPEC to init data in a VC repo in `default-directory'.
+  "Use SPEC to init data in a `Git' VC repo in `default-directory'.
 Returns a buffer inside the repo."
   (message "Initializing test data in Git repo")
   (message "Test Git repo spec: %s" spec)
@@ -64,7 +72,8 @@ Returns a buffer inside the repo."
          (tmp-buff (find-file tmp-name))
          (tmp-contents (elsewhere--test-repo-spec-git-test-file-contents spec))
          (remote (elsewhere--test-repo-spec-git-remote spec))
-         (branch (elsewhere--test-repo-spec-git-branch spec)))
+         (branch (elsewhere--test-repo-spec-git-branch spec))
+         (commit (elsewhere--test-repo-spec-git-commit spec)))
 
     (when tmp-contents
       (message "Writing contents to file: %s" tmp-name)
@@ -77,22 +86,26 @@ Returns a buffer inside the repo."
       (message "Registering file in Git: %s" (buffer-file-name))
       (vc-register)
 
-      ;; TODO: is there a built-in way to add a remote?
-      (message "Adding Git remote as origin: %s" remote)
-      (vc-do-command
-       "*vc*"
-       0
-       vc-git-program
-       nil
-       "remote"
-       "add"
-       "origin"
-       remote)
+      (when remote
+        ;; TODO: Is there a built-in way to add a remote?
+        (message "Adding Git remote as origin: %s" remote)
+        (vc-do-command
+         "*vc*"
+         0
+         vc-git-program
+         nil
+         "remote"
+         "add"
+         "origin"
+         remote)
+
+        (should (equal remote
+                       (vc-git-repository-url (buffer-file-name)))))
 
       (when branch
         (message "Creating Git branch: %s" branch)
         ;; HACK: `vc-create-branch' prompts for user input, so we
-        ;; instead use `vc-git-command'.
+        ;;       instead use `vc-git-command'.
         (vc-git-command "*vc*" 0 nil "checkout" "-b" branch)
 
         (let* ((raw (with-output-to-string
@@ -105,17 +118,15 @@ Returns a buffer inside the repo."
 
         (message "Checked out Git branch: %s" branch))
 
-      (should (equal remote
-                     (vc-git-repository-url (buffer-file-name)))))
+      (when commit
+        (message "Creating commit on: %s" (or branch "HEAD"))
+        (vc-git-checkin nil commit)))
 
     (message "Finished initializing test data in Git repo")
     tmp-buff))
 
-(cl-defgeneric elsehwere--test-destroy-repo (spec)
-  "Use SPEC to destroy data in a VC repo in `default-directory'.")
-
 (cl-defmethod elsewhere--test-destroy-repo ((spec elsewhere--test-repo-spec-git))
-  "Use SPEC to destroy data in a VC repo in `default-directory'."
+  "Use SPEC to destroy data in a `Git' VC repo in `default-directory'."
   (message "Destroying test data in Git repo")
   (message "Test Git repo spec: %s" spec)
   (let* ((tmp-name (expand-file-name
@@ -136,58 +147,97 @@ Returns a buffer inside the repo."
 BACKEND is the VC backend to use, SPEC is a configuration for
 test data used inside the VC repo, and BODY will be executed with
 a `default-directory' equal to this temporary test directory."
-  `(ert-with-temp-directory tempdir
-     (message "Created test temp dir: %s" tempdir)
-     (let* ((vc-handled-backends (list ,backend))
-            (default-directory tempdir)
-            (process-environment process-environment)
-            (should-toggle-transient-mark-mode (not transient-mark-mode))
-            elsewhere--test-cleanup-hook)
-       (unwind-protect
-           (progn
-             (when should-toggle-transient-mark-mode
-               (message "Turning on transient-mark-mode")
-               (transient-mark-mode +1))
+  `(ert-with-temp-directory
+    tempdir
+    (message "Created test temp dir: %s" tempdir)
+    (let* ((vc-handled-backends (list ,backend))
+           (default-directory tempdir)
+           (process-environment process-environment)
+           (should-toggle-transient-mark-mode (not transient-mark-mode))
+           elsewhere--test-cleanup-hook)
+      (unwind-protect
+          (progn
+            (when should-toggle-transient-mark-mode
+              (message "Turning on transient-mark-mode")
+              (transient-mark-mode +1))
 
-             (add-hook
-              'elsewhere--test-cleanup-hook
-              (lambda ()
-                (message "Running test cleanup hook")
-                (elsewhere--test-destroy-repo ,spec)
+            (add-hook
+             'elsewhere--test-cleanup-hook
+             (lambda ()
+               (message "Running test cleanup hook")
+               (elsewhere--test-destroy-repo ,spec)
 
-                (when should-toggle-transient-mark-mode
-                  (message "Turning off transient-mark-mode")
-                  (transient-mark-mode -1))
+               (when should-toggle-transient-mark-mode
+                 (message "Turning off transient-mark-mode")
+                 (transient-mark-mode -1))
 
-                (message "Finished running test cleanup hook")))
+               (message "Finished running test cleanup hook")))
 
-             (should (file-directory-p default-directory))
-             (message "Creating repo with backend: %s" ,backend)
-             (vc-create-repo ,backend)
-             (should (equal (vc-responsible-backend default-directory) ,backend))
-             (message "Created repo with backend: %s" ,backend)
+            (should (file-directory-p default-directory))
+            (message "Creating repo with backend: %s" ,backend)
+            (vc-create-repo ,backend)
+            (should (equal (vc-responsible-backend default-directory) ,backend))
+            (message "Created repo with backend: %s" ,backend)
 
-             (message "Initializing test data in repo")
-             (let* ((tmp-buff (elsewhere--test-initialize-repo ,spec)))
-               (with-current-buffer tmp-buff
-                 (message "Executing test body in buffer: %s" tmp-buff)
-                 ,@body
-                 (message "Finished executing test body"))))
-         (ignore-errors
-           (message "About to run test cleanup hooks")
-           (run-hooks 'elsewhere--test-cleanup-hook)
-           (message "Finished running test cleanup hooks"))))))
+            (message "Initializing test data in repo")
+            (let* ((tmp-buff (elsewhere--test-initialize-repo ,spec)))
+              (with-current-buffer tmp-buff
+                (message "Executing test body in buffer: %s" tmp-buff)
+                ,@body
+                (message "Finished executing test body"))))
+        (ignore-errors
+          (message "About to run test cleanup hooks")
+          (run-hooks 'elsewhere--test-cleanup-hook)
+          (message "Finished running test cleanup hooks"))))))
+
+(defun elsewhere--test-contains-hash? (text &rest regexps)
+  "Return non-nil if TEXT is a hash and all provided REGEXPS match.
+Any text in TEXT which matches one of the REGEXPS will be removed
+before performing the SHA format check.  If any of the REGEXPS
+don't match, then the function will return nil.  After all
+REGEXPS have been matched and removed, the remaining text left
+over will be checked to see if it appears to be in the format of
+a SHA hash."
+  (let* ((regexp (car regexps)))
+    (if regexp
+        (progn
+          (message "Checking regexp: %s" regexp)
+          (and (string-match regexp text)
+               (apply #'elsewhere--test-contains-hash?
+                      (replace-regexp-in-string regexp "" text)
+                      (cdr regexps))))
+      (message "Checking for hash format in string: %s" text)
+      (string-match (rx line-start (= 40 alphanumeric) line-end) text))))
+
+;; FIXME: With my flymake setup, I see the this warning on the following line:
+;;          reference to free variable ‘utf-8’
+;;        Where does this originate from?
+(ert-deftest elsewhere--test-elsewhere-open-git-remote-not-configured ()
+  (elsewhere--test-with-repo
+   'Git
+   (make-elsewhere--test-repo-spec-git
+    :branch "branch"
+    :test-file-name "elsewhere.el")
+   (let* ((browse-url-handlers
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (ert-fail "Bad URL was opened"))))))
+     (should (length= browse-url-handlers 1))
+     (should-error
+      (elsewhere-open nil nil nil t)
+      :type 'user-error))))
 
 (ert-deftest elsewhere--test-elsewhere-open-git-remote-not-supported ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "https://example.com/wesnel/elsewhere.git"
-    :branch "main"
+    :branch "branch"
     :test-file-name "elsewhere.el")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (ert-fail "Bad URL was opened"))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (ert-fail "Bad URL was opened"))))))
      (should (length= browse-url-handlers 1))
      (should-error
       (elsewhere-open nil nil nil t)
@@ -198,12 +248,13 @@ a `default-directory' equal to this temporary test directory."
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "https://github.com/wesnel/elsewhere.git"
-    :branch "main"
+    :branch "branch"
     :test-file-name "elsewhere.el")
    (let* ((elsewhere-recognized-backends nil)
           (browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (ert-fail "Bad URL was opened"))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (ert-fail "Bad URL was opened"))))))
      (should (length= browse-url-handlers 1))
      (should-error
       (elsewhere-open nil nil nil t)
@@ -214,13 +265,14 @@ a `default-directory' equal to this temporary test directory."
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "https://github.com/wesnel/elsewhere.git"
-    :branch "main"
+    :branch "branch"
     :test-file-name "elsewhere.el"
     :test-file-contents "1\n2\n3\n4\n5\n6\n7")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://github.com/wesnel/elsewhere/blob/main/elsewhere.el#L2-L5"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (equal "https://github.com/wesnel/elsewhere/blob/branch/elsewhere.el#L2-L5"
+                                 url)))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -241,13 +293,14 @@ a `default-directory' equal to this temporary test directory."
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "https://github.com/wesnel/elsewhere.git"
-    :branch "main"
+    :branch "branch"
     :test-file-name "elsewhere.el"
     :test-file-contents "1\n2\n3\n4\n5\n6\n7")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://github.com/wesnel/elsewhere/blob/main/elsewhere.el"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (equal "https://github.com/wesnel/elsewhere/blob/branch/elsewhere.el"
+                                 url)))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -260,31 +313,33 @@ a `default-directory' equal to this temporary test directory."
        (should (not (use-region-p)))
        (elsewhere-open nil start nil t)))))
 
-(ert-deftest elsewhere--test-elsewhere-open-github-http-main ()
+(ert-deftest elsewhere--test-elsewhere-open-github-http-branch ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "https://github.com/wesnel/elsewhere.git"
-    :branch "main"
+    :branch "branch"
     :test-file-name "elsewhere.el")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://github.com/wesnel/elsewhere/blob/main/elsewhere.el"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (equal "https://github.com/wesnel/elsewhere/blob/branch/elsewhere.el"
+                                 url)))))))
      (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t))))
 
-(ert-deftest elsewhere--test-elsewhere-open-github-ssh-main ()
+(ert-deftest elsewhere--test-elsewhere-open-github-ssh-branch ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "git@github.com:wesnel/elsewhere.git"
-    :branch "main"
+    :branch "branch"
     :test-file-name "elsewhere.el")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://github.com/wesnel/elsewhere/blob/main/elsewhere.el"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (equal "https://github.com/wesnel/elsewhere/blob/branch/elsewhere.el"
+                                 url)))))))
      (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t))))
 
@@ -293,12 +348,15 @@ a `default-directory' equal to this temporary test directory."
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "https://github.com/wesnel/elsewhere.git"
-    :branch "c64ad3953dfbd7bbf23d36fe302b1e54112022d1"
-    :test-file-name "elsewhere.el")
+    :test-file-name "elsewhere.el"
+    :commit "message")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (elsewhere--test-contains-hash?
+                           url
+                           (rx line-start "https://github.com/wesnel/elsewhere/blob/")
+                           (rx "/elsewhere.el" line-end))))))))
      (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t))))
 
@@ -307,12 +365,15 @@ a `default-directory' equal to this temporary test directory."
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "git@github.com:wesnel/elsewhere.git"
-    :branch "c64ad3953dfbd7bbf23d36fe302b1e54112022d1"
-    :test-file-name "elsewhere.el")
+    :test-file-name "elsewhere.el"
+    :commit "message")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (elsewhere--test-contains-hash?
+                           url
+                           (rx line-start "https://github.com/wesnel/elsewhere/blob/")
+                           (rx "/elsewhere.el" line-end))))))))
      (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t))))
 
@@ -321,13 +382,16 @@ a `default-directory' equal to this temporary test directory."
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "https://github.com/wesnel/elsewhere.git"
-    :branch "c64ad3953dfbd7bbf23d36fe302b1e54112022d1"
     :test-file-name "elsewhere.el"
-    :test-file-contents "1\n2\n3\n4\n5\n6\n7")
+    :test-file-contents "1\n2\n3\n4\n5\n6\n7"
+    :commit "message")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2-L5"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (elsewhere--test-contains-hash?
+                           url
+                           (rx line-start "https://github.com/wesnel/elsewhere/blob/")
+                           (rx "/elsewhere.el#L2-L5" line-end))))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -343,13 +407,16 @@ a `default-directory' equal to this temporary test directory."
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "git@github.com:wesnel/elsewhere.git"
-    :branch "c64ad3953dfbd7bbf23d36fe302b1e54112022d1"
     :test-file-name "elsewhere.el"
-    :test-file-contents "1\n2\n3\n4\n5\n6\n7")
+    :test-file-contents "1\n2\n3\n4\n5\n6\n7"
+    :commit "message")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2-L5"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (elsewhere--test-contains-hash?
+                           url
+                           (rx line-start "https://github.com/wesnel/elsewhere/blob/")
+                           (rx "/elsewhere.el#L2-L5" line-end))))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -365,13 +432,16 @@ a `default-directory' equal to this temporary test directory."
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "https://github.com/wesnel/elsewhere.git"
-    :branch "c64ad3953dfbd7bbf23d36fe302b1e54112022d1"
     :test-file-name "elsewhere.el"
-    :test-file-contents "1\n2\n3\n4\n5\n6\n7")
+    :test-file-contents "1\n2\n3\n4\n5\n6\n7"
+    :commit "message")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (elsewhere--test-contains-hash?
+                           url
+                           (rx line-start "https://github.com/wesnel/elsewhere/blob/")
+                           (rx "/elsewhere.el#L2" line-end))))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -386,13 +456,16 @@ a `default-directory' equal to this temporary test directory."
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "git@github.com:wesnel/elsewhere.git"
-    :branch "c64ad3953dfbd7bbf23d36fe302b1e54112022d1"
     :test-file-name "elsewhere.el"
-    :test-file-contents "1\n2\n3\n4\n5\n6\n7")
+    :test-file-contents "1\n2\n3\n4\n5\n6\n7"
+    :commit "message")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://github.com/wesnel/elsewhere/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (elsewhere--test-contains-hash?
+                           url
+                           (rx line-start "https://github.com/wesnel/elsewhere/blob/")
+                           (rx "/elsewhere.el#L2" line-end))))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -402,31 +475,33 @@ a `default-directory' equal to this temporary test directory."
      (should (use-region-p))
      (elsewhere-open nil nil nil t))))
 
-(ert-deftest elsewhere--test-elsewhere-open-gitlab-http-main ()
+(ert-deftest elsewhere--test-elsewhere-open-gitlab-http-branch ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "https://gitlab.com/wesnel/elsewhere.git"
-    :branch "main"
+    :branch "branch"
     :test-file-name "elsewhere.el")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/main/elsewhere.el"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/branch/elsewhere.el"
+                                 url)))))))
      (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t))))
 
-(ert-deftest elsewhere--test-elsewhere-open-gitlab-ssh-main ()
+(ert-deftest elsewhere--test-elsewhere-open-gitlab-ssh-branch ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "git@gitlab.com:wesnel/elsewhere.git"
-    :branch "main"
+    :branch "branch"
     :test-file-name "elsewhere.el")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/main/elsewhere.el"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/branch/elsewhere.el"
+                                 url)))))))
      (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t))))
 
@@ -435,12 +510,15 @@ a `default-directory' equal to this temporary test directory."
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "https://gitlab.com/wesnel/elsewhere.git"
-    :branch "c64ad3953dfbd7bbf23d36fe302b1e54112022d1"
-    :test-file-name "elsewhere.el")
+    :test-file-name "elsewhere.el"
+    :commit "message")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (elsewhere--test-contains-hash?
+                           url
+                           (rx line-start "https://gitlab.com/wesnel/elsewhere/-/blob/")
+                           (rx "/elsewhere.el" line-end))))))))
      (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t))))
 
@@ -449,12 +527,15 @@ a `default-directory' equal to this temporary test directory."
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "git@gitlab.com:wesnel/elsewhere.git"
-    :branch "c64ad3953dfbd7bbf23d36fe302b1e54112022d1"
-    :test-file-name "elsewhere.el")
+    :test-file-name "elsewhere.el"
+    :commit "message")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (elsewhere--test-contains-hash?
+                           url
+                           (rx line-start "https://gitlab.com/wesnel/elsewhere/-/blob/")
+                           (rx "/elsewhere.el" line-end))))))))
      (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t))))
 
@@ -463,13 +544,16 @@ a `default-directory' equal to this temporary test directory."
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "https://gitlab.com/wesnel/elsewhere.git"
-    :branch "c64ad3953dfbd7bbf23d36fe302b1e54112022d1"
     :test-file-name "elsewhere.el"
-    :test-file-contents "1\n2\n3\n4\n5\n6\n7")
+    :test-file-contents "1\n2\n3\n4\n5\n6\n7"
+    :commit "message")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2-L5"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (elsewhere--test-contains-hash?
+                           url
+                           (rx line-start "https://gitlab.com/wesnel/elsewhere/-/blob/")
+                           (rx "/elsewhere.el#L2-L5" line-end))))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -485,13 +569,16 @@ a `default-directory' equal to this temporary test directory."
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "git@gitlab.com:wesnel/elsewhere.git"
-    :branch "c64ad3953dfbd7bbf23d36fe302b1e54112022d1"
     :test-file-name "elsewhere.el"
-    :test-file-contents "1\n2\n3\n4\n5\n6\n7")
+    :test-file-contents "1\n2\n3\n4\n5\n6\n7"
+    :commit "message")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2-L5"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (elsewhere--test-contains-hash?
+                           url
+                           (rx line-start "https://gitlab.com/wesnel/elsewhere/-/blob/")
+                           (rx "/elsewhere.el#L2-L5" line-end))))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -507,13 +594,16 @@ a `default-directory' equal to this temporary test directory."
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "https://gitlab.com/wesnel/elsewhere.git"
-    :branch "c64ad3953dfbd7bbf23d36fe302b1e54112022d1"
     :test-file-name "elsewhere.el"
-    :test-file-contents "1\n2\n3\n4\n5\n6\n7")
+    :test-file-contents "1\n2\n3\n4\n5\n6\n7"
+    :commit "message")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (elsewhere--test-contains-hash?
+                           url
+                           (rx line-start "https://gitlab.com/wesnel/elsewhere/-/blob/")
+                           (rx "/elsewhere.el#L2" line-end))))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -528,13 +618,16 @@ a `default-directory' equal to this temporary test directory."
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "git@gitlab.com:wesnel/elsewhere.git"
-    :branch "c64ad3953dfbd7bbf23d36fe302b1e54112022d1"
     :test-file-name "elsewhere.el"
-    :test-file-contents "1\n2\n3\n4\n5\n6\n7")
+    :test-file-contents "1\n2\n3\n4\n5\n6\n7"
+    :commit "message")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://gitlab.com/wesnel/elsewhere/-/blob/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/elsewhere.el#L2"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (elsewhere--test-contains-hash?
+                           url
+                           (rx line-start "https://gitlab.com/wesnel/elsewhere/-/blob/")
+                           (rx "/elsewhere.el#L2" line-end))))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -544,34 +637,33 @@ a `default-directory' equal to this temporary test directory."
      (should (use-region-p))
      (elsewhere-open nil nil nil t))))
 
-;;
-
-
-(ert-deftest elsewhere--test-elsewhere-open-sourcehut-http-main ()
+(ert-deftest elsewhere--test-elsewhere-open-sourcehut-http-branch ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "https://git.sr.ht/~wgn/elsewhere"
-    :branch "main"
+    :branch "branch"
     :test-file-name "elsewhere.el")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/main/item/elsewhere.el"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/branch/item/elsewhere.el"
+                                 url)))))))
      (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t))))
 
-(ert-deftest elsewhere--test-elsewhere-open-sourcehut-ssh-main ()
+(ert-deftest elsewhere--test-elsewhere-open-sourcehut-ssh-branch ()
   (elsewhere--test-with-repo
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "git@git.sr.ht:~wgn/elsewhere"
-    :branch "main"
+    :branch "branch"
     :test-file-name "elsewhere.el")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/main/item/elsewhere.el"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/branch/item/elsewhere.el"
+                                 url)))))))
      (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t))))
 
@@ -580,12 +672,15 @@ a `default-directory' equal to this temporary test directory."
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "https://git.sr.ht/~wgn/elsewhere"
-    :branch "c64ad3953dfbd7bbf23d36fe302b1e54112022d1"
-    :test-file-name "elsewhere.el")
+    :test-file-name "elsewhere.el"
+    :commit "message")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/item/elsewhere.el"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (elsewhere--test-contains-hash?
+                           url
+                           (rx line-start "https://git.sr.ht/~wgn/elsewhere/tree/")
+                           (rx "/item/elsewhere.el" line-end))))))))
      (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t))))
 
@@ -594,12 +689,15 @@ a `default-directory' equal to this temporary test directory."
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "git@git.sr.ht:~wgn/elsewhere"
-    :branch "c64ad3953dfbd7bbf23d36fe302b1e54112022d1"
-    :test-file-name "elsewhere.el")
+    :test-file-name "elsewhere.el"
+    :commit "message")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/item/elsewhere.el"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (elsewhere--test-contains-hash?
+                           url
+                           (rx line-start "https://git.sr.ht/~wgn/elsewhere/tree/")
+                           (rx "/item/elsewhere.el" line-end))))))))
      (should (length= browse-url-handlers 1))
      (elsewhere-open nil nil nil t))))
 
@@ -608,13 +706,16 @@ a `default-directory' equal to this temporary test directory."
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "https://git.sr.ht/~wgn/elsewhere"
-    :branch "c64ad3953dfbd7bbf23d36fe302b1e54112022d1"
     :test-file-name "elsewhere.el"
-    :test-file-contents "1\n2\n3\n4\n5\n6\n7")
+    :test-file-contents "1\n2\n3\n4\n5\n6\n7"
+    :commit "message")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/item/elsewhere.el#L2-5"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (elsewhere--test-contains-hash?
+                           url
+                           (rx line-start "https://git.sr.ht/~wgn/elsewhere/tree/")
+                           (rx "/item/elsewhere.el#L2-5" line-end))))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -630,13 +731,16 @@ a `default-directory' equal to this temporary test directory."
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "git@git.sr.ht:~wgn/elsewhere"
-    :branch "c64ad3953dfbd7bbf23d36fe302b1e54112022d1"
     :test-file-name "elsewhere.el"
-    :test-file-contents "1\n2\n3\n4\n5\n6\n7")
+    :test-file-contents "1\n2\n3\n4\n5\n6\n7"
+    :commit "message")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/item/elsewhere.el#L2-5"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (elsewhere--test-contains-hash?
+                           url
+                           (rx line-start "https://git.sr.ht/~wgn/elsewhere/tree/")
+                           (rx "/item/elsewhere.el#L2-5" line-end))))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -652,13 +756,16 @@ a `default-directory' equal to this temporary test directory."
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "https://git.sr.ht/~wgn/elsewhere"
-    :branch "c64ad3953dfbd7bbf23d36fe302b1e54112022d1"
     :test-file-name "elsewhere.el"
-    :test-file-contents "1\n2\n3\n4\n5\n6\n7")
+    :test-file-contents "1\n2\n3\n4\n5\n6\n7"
+    :commit "message")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/item/elsewhere.el#L2"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (elsewhere--test-contains-hash?
+                           url
+                           (rx line-start "https://git.sr.ht/~wgn/elsewhere/tree/")
+                           (rx "/item/elsewhere.el#L2" line-end))))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))
@@ -673,13 +780,16 @@ a `default-directory' equal to this temporary test directory."
    'Git
    (make-elsewhere--test-repo-spec-git
     :remote "git@git.sr.ht:~wgn/elsewhere"
-    :branch "c64ad3953dfbd7bbf23d36fe302b1e54112022d1"
     :test-file-name "elsewhere.el"
-    :test-file-contents "1\n2\n3\n4\n5\n6\n7")
+    :test-file-contents "1\n2\n3\n4\n5\n6\n7"
+    :commit "message")
    (let* ((browse-url-handlers
-           '(("\\`http" . (lambda (url &rest args)
-                            (should (equal "https://git.sr.ht/~wgn/elsewhere/tree/c64ad3953dfbd7bbf23d36fe302b1e54112022d1/item/elsewhere.el#L2"
-                                           url)))))))
+           '(("\\`http"
+              . (lambda (url &rest args)
+                  (should (elsewhere--test-contains-hash?
+                           url
+                           (rx line-start "https://git.sr.ht/~wgn/elsewhere/tree/")
+                           (rx "/item/elsewhere.el#L2" line-end))))))))
      (should (length= browse-url-handlers 1))
      (forward-line)
      (should (equal 2 (line-number-at-pos)))

@@ -208,15 +208,11 @@ delineated by those line numbers will be incorporated into the
 URL.  If HEADLESS? is non-nil, then the Git revision will be the
 current revision of the current buffer.  Otherwise, the Git
 revision will be chosen using `completing-read'."
-  (let* ((remote (vc-git-repository-url file))
+  (let* ((remote (condition-case nil
+                     (vc-git-repository-url file)
+                   (error (user-error "The Git remote is not configured in this directory"))))
          (pairing (assoc remote elsewhere-recognized-remotes-git 'elsewhere--is-matching-any-remote?))
-         (rev-output (with-output-to-string
-                       (with-current-buffer standard-output
-                         (vc-git--out-ok "symbolic-ref" "HEAD"))))
-         (has-match (string-match "^\\(refs/heads/\\)?\\(.+\\)$" rev-output))
-         (current-rev (when has-match (match-string 2 rev-output)))
-         (rev (if headless? current-rev
-                (elsewhere--choose-git-revision-interactively current-rev)))
+         (rev (elsewhere--choose-git-revision file headless?))
          (path (file-relative-name file (vc-root-dir))))
     (if (not pairing) (user-error "This Git remote is not supported")
       (let* ((builder (cdr pairing)))
@@ -239,8 +235,10 @@ If the line numbers TOP and BOTTOM are provided, then the region
 delineated by those line numbers will be incorporated into the URL."
   (let* ((repo (elsewhere--get-git-repo-path elsewhere-host-regexps-github remote))
          (base (format "https://github.com/%s/blob/%s/%s" repo rev path)))
-    (if (and top bottom) (if (not (eq top bottom)) (format "%s#L%d-L%d" base top bottom)
-                           (format "%s#L%d" base top))
+    (if (and top bottom)
+        (if (not (eq top bottom))
+            (format "%s#L%d-L%d" base top bottom)
+          (format "%s#L%d" base top))
       base)))
 
 (defun elsewhere--build-url-git-gitlab (remote rev path &optional top bottom)
@@ -249,8 +247,10 @@ If the line numbers TOP and BOTTOM are provided, then the region
 delineated by those line numbers will be incorporated into the URL."
   (let* ((repo (elsewhere--get-git-repo-path elsewhere-host-regexps-gitlab remote))
          (base (format "https://gitlab.com/%s/-/blob/%s/%s" repo rev path)))
-    (if (and top bottom) (if (not (eq top bottom)) (format "%s#L%d-L%d" base top bottom)
-                           (format "%s#L%d" base top))
+    (if (and top bottom)
+        (if (not (eq top bottom))
+            (format "%s#L%d-L%d" base top bottom)
+          (format "%s#L%d" base top))
       base)))
 
 (defun elsewhere--build-url-git-sourcehut (remote rev path &optional top bottom)
@@ -259,15 +259,55 @@ If the line numbers TOP and BOTTOM are provided, then the region
 delineated by those line numbers will be incorporated into the URL."
   (let* ((repo (elsewhere--get-git-repo-path elsewhere-host-regexps-sourcehut remote))
          (base (format "https://git.sr.ht/%s/tree/%s/item/%s" repo rev path)))
-    (if (and top bottom) (if (not (eq top bottom)) (format "%s#L%d-%d" base top bottom)
-                           (format "%s#L%d" base top))
+    (if (and top bottom)
+        (if (not (eq top bottom))
+            (format "%s#L%d-%d" base top bottom)
+          (format "%s#L%d" base top))
       base)))
 
-(defun elsewhere--choose-git-revision-interactively (default)
-  "Choose the Git revision to use interactively using `completing-read'.
-DEFAULT is used as the default value."
+(defun elsewhere--choose-git-revision (file &optional headless?)
+  "Choose the Git revision to use for FILE.
+If HEADLESS? is non-nil, then the Git revision will be the
+current revision of the current buffer.  Otherwise, the Git
+revision will be chosen using `completing-read'."
+  (let* ((found-branches (vc-git-branches))
+         (no-branches? (or (length= found-branches 0)
+                           (and (length= found-branches 1)
+                                (not (car found-branches)))))
+         (found-branches (if no-branches?
+                             ;; Use symbolic-ref to get the default branch.
+                             (list (elsewhere--get-current-ref))
+                           found-branches))
+         (choices found-branches)
+         (last-commit (vc-working-revision file))
+         (no-commit? (not last-commit))
+         (choices (if no-commit?
+                      choices
+                    (append (list last-commit) choices)))
+         (default (car choices)))
+    (if headless?
+        default
+      (elsewhere--choose-revision-interactively choices default))))
+
+(defun elsewhere--get-current-ref ()
+  "Use the Git symbolic-ref command to get the current ref on HEAD."
+  (let* ((ref-output
+          (with-output-to-string
+            (with-current-buffer standard-output
+              (vc-git--out-ok "symbolic-ref" "HEAD"))))
+         (has-match (string-match
+                     "^\\(refs/heads/\\)?\\(.+\\)$"
+                     ref-output))
+         (current-ref (when has-match
+                        (match-string 2 ref-output))))
+    current-ref))
+
+(defun elsewhere--choose-revision-interactively (choices &optional default)
+  "Use `completing-read' to choose among CHOICES.
+If provided, DEFAULT is the default choice to use if nothing else
+is selected or entered by the user."
   (completing-read (format "Choose revision (default %s):" default)
-                   (vc-git-branches)
+                   choices
                    nil
                    nil
                    nil
