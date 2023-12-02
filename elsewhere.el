@@ -65,6 +65,7 @@
 ;;; Code:
 
 (eval-when-compile
+  (require 'rx)
   (require 'subr-x))
 
 (require 'vc)
@@ -83,12 +84,16 @@
                 :value-type function)
   :group 'convenience)
 
-(defcustom elsewhere-host-regexp-github-http "^https?://github.com/"
+(defcustom elsewhere-host-regexp-github-http (rx line-start
+                                                 "http"
+                                                 (zero-or-one "s")
+                                                 "://github.com/")
   "Regexp for matching the host in a GitHub HTTP remote URL."
   :type 'string
   :group 'convenience)
 
-(defcustom elsewhere-host-regexp-github-ssh "^git@github.com:"
+(defcustom elsewhere-host-regexp-github-ssh (rx line-start
+                                                "git@github.com:")
   "Regexp for matching the host in a GitHub SSH remote URL."
   :type 'string
   :group 'convenience)
@@ -98,12 +103,16 @@
   :type '(repeat string)
   :group 'convenience)
 
-(defcustom elsewhere-host-regexp-gitlab-http "^https?://gitlab.com/"
+(defcustom elsewhere-host-regexp-gitlab-http (rx line-start
+                                                 "http"
+                                                 (zero-or-one "s")
+                                                 "://gitlab.com/")
   "Regexp for matching the host in a GitLab HTTP remote URL."
   :type 'string
   :group 'convenience)
 
-(defcustom elsewhere-host-regexp-gitlab-ssh "^git@gitlab.com:"
+(defcustom elsewhere-host-regexp-gitlab-ssh (rx line-start
+                                                "git@gitlab.com:")
   "Regexp for matching the host in a GitLab SSH remote URL."
   :type 'string
   :group 'convenience)
@@ -113,12 +122,16 @@
   :type '(repeat string)
   :group 'convenience)
 
-(defcustom elsewhere-host-regexp-sourcehut-http "^https?://git.sr.ht/"
+(defcustom elsewhere-host-regexp-sourcehut-http (rx line-start
+                                                    "http"
+                                                    (zero-or-one "s")
+                                                    "://git.sr.ht/")
   "Regexp for matching the host in a Sourcehut HTTP remote URL."
   :type 'string
   :group 'convenience)
 
-(defcustom elsewhere-host-regexp-sourcehut-ssh "^git@git.sr.ht:"
+(defcustom elsewhere-host-regexp-sourcehut-ssh (rx line-start
+                                                   "git@git.sr.ht:")
   "Regexp for matching the host in a Sourcehut SSH remote URL."
   :type 'string
   :group 'convenience)
