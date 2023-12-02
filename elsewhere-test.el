@@ -6,8 +6,8 @@
 ;; Maintainer: Wesley Nelson <wgn@wesnel.dev>
 ;; Created: 23 Jul 2023
 
-;; Version: 1.2.0
-;; Package-Requires: ((emacs "29.1") (elsewhere "1.2.0"))
+;; Version: 1.2.1
+;; Package-Requires: ((emacs "29.1") (elsewhere "1.2.1"))
 
 ;; Keywords: convenience
 

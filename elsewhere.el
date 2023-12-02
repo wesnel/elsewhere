@@ -6,7 +6,7 @@
 ;; Maintainer: Wesley Nelson <wgn@wesnel.dev>
 ;; Created: 24 Jul 2023
 
-;; Version: 1.2.0
+;; Version: 1.2.1
 ;; Package-Requires: ((emacs "29.1"))
 
 ;; Keywords: convenience
@@ -38,6 +38,12 @@
 ;; elsewhere-open.  You should see a webpage open in your browser.
 
 ;;; Change Log:
+
+;; 2023-12-01 - v1.2.1
+;; * Improve logic for selecting a Git revision.
+;; * Use `rx' to build regexps.
+;; * Improve tests for permalinks which contain Git commit hashes.
+;; * Add error handling for if a Git remote is not configured.
 
 ;; 2023-11-07 - v1.2.0
 ;; * Add support for Sourcehut
