@@ -21,7 +21,7 @@ permalinked webpage in your browser.
 
 <!-- markdown-toc end -->
 
-## Usage
+#### Usage
 
 Open a version-controlled file, (optionally) mark a region in the
 file, and execute `M-x elsewhere-open`. You should see a webpage open
@@ -30,31 +30,31 @@ automatically open it in your browser, then try `M-x
 elsewhere-build-url` instead. With that command, you should see the
 URL in your echo area.
 
-## Demo
+#### Demo
 
-### `elsewhere-open`
+##### `elsewhere-open`
 
 ![elsewhere-open](https://raw.githubusercontent.com/wesnel/elsewhere/demo/elsewhere-open.gif)
 
-### `elsewhere-build-url`
+##### `elsewhere-build-url`
 
 ![elsewhere-build-url](https://raw.githubusercontent.com/wesnel/elsewhere/demo/elsewhere-build-url.gif)
 
-## Requirements
+#### Requirements
 
 > [!IMPORTANT]
 > Currently, `elsewhere.el` requires Emacs version `29.1` or newer.
 > You can check your Emacs version by typing `M-x emacs-version`.
 
-## Currently-Supported VC Back Ends
+#### Currently-Supported VC Back Ends
 
-### Git
+##### Git
 
 - [GitHub](https://github.com/)
 - [GitLab](https://gitlab.com/)
 - [Sourcehut](https://git.sr.ht/)
 
-## How is `elsewhere.el` different from `git-link`?
+#### How is `elsewhere.el` different from `git-link`?
 
 The [`git-link`](https://github.com/sshaw/git-link) package is similar
 to `elsewhere.el`. There are several minor differences between that
