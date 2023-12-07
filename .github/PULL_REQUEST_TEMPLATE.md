@@ -32,7 +32,7 @@ If the pull request adds additional support for a new version control back end o
 
 - [ ] Add this new version control back end to the list of supported systems under the `Currently-Supported VC Back Ends` header of `README.md`.
 - [ ] Regenerate the table of contents in `README.md` using the [`markdown-toc`](https://github.com/ardumont/markdown-toc) Emacs package.
-- [ ] Add this new version control back end to the list of supported systems under the `Version control in use` header of `.github/ISSUE_TEMPLATE.md`.
+- [ ] Add this new version control back end to the list of supported systems under the `version-control` block of `.github/ISSUE_TEMPLATE/BUG.yml`.
 
 ## Testing
 

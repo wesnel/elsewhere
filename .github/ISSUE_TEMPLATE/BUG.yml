@@ -1,0 +1,74 @@
+name: "🐞 Bug"
+description: "File a bug report"
+title: "[BUG] "
+labels:
+  - "bug"
+assignees:
+  - "wesnel"
+body:
+  - type: "markdown"
+    attributes:
+      value: |
+        Before creating a new issue, please search the GitHub Issues to see if a similar issue already exists.
+
+        Please fill in as much detail as possible.
+  - type: "textarea"
+    id: "steps-to-reproduce"
+    attributes:
+      label: "Steps to reproduce"
+      description: |
+        What steps do you take to encounter the issue? Does the issue happen every time, or only some of the time? Ideally, you should use a clean Emacs with only elsewhere loaded, i.e.:
+
+        ```
+        emacs -Q --eval "(require 'elsewhere)"
+        ```
+    validations:
+      required: true
+  - type: "textarea"
+    id: "expected-behavior"
+    attributes:
+      label: "Expected behavior"
+      description: |
+        What outcome would you have expected or preferred?
+    validations:
+      required: true
+  - type: "textarea"
+    id: "actual-behavior"
+    attributes:
+      label: "Actual behavior"
+      description: |
+        What was the problematic outcome which actually occurred?
+    validations:
+      required: true
+  - type: "input"
+    id: "emacs-version"
+    attributes:
+      label: "Emacs version used"
+      description: |
+        What is your Emacs version?
+
+        ```
+        M-x emacs-version RET
+        ```
+  - type: "input"
+    id: "elsewhere-version"
+    attributes:
+      label: "Elsewhere version used"
+      description: |
+        What is your `elsewhere.el` version?
+
+        ```
+        M-x describe-variable RET elsewhere-version RET
+        ```
+  - type: "checkboxes"
+    id: version-control
+    attributes:
+      label: "Version control used"
+      description: |
+        The behavior of elsewhere can vary depending on the details of the version control system which you are using it with. Please check the boxes which best describe the version control system which you are using when you encounter this issue.
+
+        If there is not any appropriate box, then your use case might not be supported yet.
+      options:
+        - label: GitHub
+        - label: GitLab
+        - label: Sourcehut
