@@ -15,6 +15,11 @@ Please check what applies. Note that these are not hard requirements, but instea
 
 - [ ] Ensured that all work in this pull request satisfies the license in `LICENSE.txt`.
 
+## Git
+
+- [ ] Made each commit a logically separate changeset.
+- [ ] Wrote commit messages that follow the style guide recommended in the `Commit Guidelines` section of [this chapter](https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project) of the Pro Git book.
+
 ## Code
 
 - [ ] Used `rx` instead of strings for any regular expressions in `elsewhere.el`.
