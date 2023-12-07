@@ -57,7 +57,7 @@ The version numbering scheme should follow [semantic versioning](https://semver.
 
 - [ ] Add one or more bullet points under the `[Unreleased]` level 2 header on line 8 of `CHANGELOG.md` containing a brief summary of your changes.
 
-      Each of these bullet points should be underneath a level 3 header of `Added`, `Removed`, `Changed`, or `Fixed` --- whichever most appropriately categorizes that bullet point.
+  Each of these bullet points should be underneath a level 3 header of `Added`, `Removed`, `Changed`, or `Fixed` --- whichever most appropriately categorizes that bullet point.
 
 <!--
 The remainder of this "Changelog" section is mostly for maintainers.
@@ -65,21 +65,17 @@ The remainder of this "Changelog" section is mostly for maintainers.
 
 If this pull request will result in a new version-numbered release (see the "Version numbers" section above), then also do the following:
 
-- [ ] Add a new level 2 header to `CHANGELOG.md` just above the header of most recent previous version-numbered release. The header should follow the following format, where `version_number` is your new version number from the "Version numbers" section above:
+- [ ] Add a new level 2 header to `CHANGELOG.md` just above the header of most recent previous version-numbered release.
 
-      ```
-      [${version_number}]
-      ```
+  The header should follow the following format, where `version_number` is your new version number from the "Version numbers" section above:
+
+        [${version_number}]
 
 - [ ] Move all unreleased changes under the `[Unreleased]` header on line 8 of `CHANGELOG.md` to instead be under your new header from the previous step.
-- [ ] Near the bottom of `CHANGELOG.md`, underneath the line which begins with `[Unreleased]:` add a line which follows the following format, where `version_number` is the same as the previous step and `previous_version_number` is the most recent version number prior to your new one:
+- [ ] Near the bottom of `CHANGELOG.md` underneath the line which begins with `[Unreleased]:`, add a line which follows the following format, where `version_number` is the same as the previous step and `previous_version_number` is the most recent version number prior to your new one:
 
-      ```
-      [${version_number}]: https://github.com/wesnel/elsewhere/compare/v${previous_version_number}...v${version_number}
-      ```
+        [${version_number}]: https://github.com/wesnel/elsewhere/compare/v${previous_version_number}...v${version_number}
 
 - [ ] Near the bottom of `CHANGELOG.md`, edit the line which begins with `[Unreleased]:` to contain your new `version_number` from the previous step:
 
-      ```
-      [Unreleased]: https://github.com/wesnel/elsewhere/compare/v${version_number}...HEAD
-      ```
+        [Unreleased]: https://github.com/wesnel/elsewhere/compare/v${version_number}...HEAD
