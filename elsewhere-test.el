@@ -2,16 +2,14 @@
 
 ;; Copyright (C) 2023 Wesley Nelson <wgn@wesnel.dev>
 
+;; URL: https://github.com/wesnel/elsewhere
 ;; Author: Wesley Nelson <wgn@wesnel.dev>
 ;; Maintainer: Wesley Nelson <wgn@wesnel.dev>
-;; Created: 23 Jul 2023
+;; Created: 24 Jul 2023
+;; Keywords: convenience
 
 ;; Version: 1.3.0
 ;; Package-Requires: ((emacs "29.1") (elsewhere "1.3.0"))
-
-;; Keywords: convenience
-
-;; URL: https://github.com/wesnel/elsewhere
 
 ;; This file is not part of GNU Emacs.
 

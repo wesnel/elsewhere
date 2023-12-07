@@ -2,16 +2,14 @@
 
 ;; Copyright (C) 2023 Wesley Nelson <wgn@wesnel.dev>
 
+;; URL: https://github.com/wesnel/elsewhere
 ;; Author: Wesley Nelson <wgn@wesnel.dev>
 ;; Maintainer: Wesley Nelson <wgn@wesnel.dev>
 ;; Created: 24 Jul 2023
+;; Keywords: convenience
 
 ;; Version: 1.3.0
 ;; Package-Requires: ((emacs "29.1"))
-
-;; Keywords: convenience
-
-;; URL: https://github.com/wesnel/elsewhere
 
 ;; This file is not part of GNU Emacs.
 
@@ -37,41 +35,10 @@
 ;; file, and call `elsewhere-open' interactively by executing M-x
 ;; elsewhere-open.  You should see a webpage open in your browser.
 
-;;; Change Log:
-
-;; 2023-12-01 - v1.3.0
-;; * Add ability to select a remote.
-
-;; 2023-12-01 - v1.2.1
-;; * Improve logic for selecting a Git revision.
-;; * Use `rx' to build regexps.
-;; * Improve tests for permalinks which contain Git commit hashes.
-;; * Add error handling for if a Git remote is not configured.
-
-;; 2023-11-07 - v1.2.0
-;; * Add support for Sourcehut
-;; * Fix broken start and end arguments for `elsewhere-build-url'
-
-;; 2023-11-06 - v1.1.0
-;; * Bump minimum Emacs version to 29.1
-;; * Remove interactive? argument for `elsewhere-open'
-;; * Remove interactive? argument for `elsewhere-build-url'
-;; * Add headless? argument for `elsewhere-open'
-;; * Add silent? argument for `elsewhere-build-url'
-;; * Add headless? argument for `elsewhere-build-url'
-;; * Switch to external Git command for fetching the current revision
-;; * Switch to `vc-responsible-backend' for fetching the VC backend
-;; * Add Eldev as the development tool for this package
-;; * Add tests for `elsewhere-build-url'
-
-;; 2023-07-26 - v1.0.0
-;; * Support `Git' backend from `vc-handled-backends'
-;; * Support GitHub and GitLab
-;; * Support generating URL in echo area
-;; * Support opening generated URL in browser using `browse-url'
-;; * Support choosing a revision for URLs using `completing-read'
-
 ;;; Code:
+
+(defconst elsewhere-version "1.3.0"
+  "Current version of elsewhere.")
 
 (eval-when-compile
   (require 'rx)
