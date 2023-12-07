@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.1]
+
 ### Added
 
 * Added variable `elsewhere-version`.
@@ -71,7 +73,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Support opening generated URL in browser using `browse-url`
 * Support choosing a revision for URLs using `completing-read`
 
-[Unreleased]: https://github.com/wesnel/elsewhere/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/wesnel/elsewhere/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/wesnel/elsewhere/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/wesnel/elsewhere/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/wesnel/elsewhere/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/wesnel/elsewhere/compare/v1.1.0...v1.2.0

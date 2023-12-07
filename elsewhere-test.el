@@ -8,8 +8,8 @@
 ;; Created: 24 Jul 2023
 ;; Keywords: convenience
 
-;; Version: 1.3.0
-;; Package-Requires: ((emacs "29.1") (elsewhere "1.3.0"))
+;; Version: 1.3.1
+;; Package-Requires: ((emacs "29.1") (elsewhere "1.3.1"))
 
 ;; This file is not part of GNU Emacs.
 
