@@ -50,6 +50,10 @@ Open a version-controlled file, (optionally) mark a region in the file, and exec
 - [GitLab](https://gitlab.com/)
 - [Sourcehut](https://git.sr.ht/)
 
+### Mercurial
+
+- [Sourcehut](https://hg.sr.ht)
+
 ## How is `elsewhere.el` different from `git-link`?
 
 The [`git-link`](https://github.com/sshaw/git-link) package is similar to `elsewhere.el`. There are several minor differences between that package and `elsewhere.el`, but the primary benefit of `elsewhere.el` is that it supports multiple version control back ends other than Git. In fact, since `elsewhere.el` is built on top of the built-in `vc` package, support could theoretically be added for any back end listed [here](https://www.gnu.org/software/emacs/manual/html_node/emacs/Version-Control-Systems.html).
