@@ -1,25 +1,25 @@
-#### Description of changes
+# Description of changes
 
 <!--
 In this section, please write a brief summary of the changes in this pull request.
 -->
 
 ---
-#### Things done
+# Things done
 
 <!--
 Please check what applies. Note that these are not hard requirements, but instead merely serve as information for reviewers and reminders to yourself.
 -->
 
-##### Legal
+## Legal
 
 - [ ] Ensured that all work in this pull request satisfies the license in `LICENSE.txt`.
 
-##### Code
+## Code
 
 - [ ] Used `rx` instead of strings for any regular expressions in `elsewhere.el`.
 
-##### Documentation
+## Documentation
 
 - [ ] Added documentation strings to any new functions in `elsewhere.el`.
 
@@ -29,11 +29,11 @@ If the pull request adds additional support for a new version control back end o
 - [ ] Regenerate the table of contents in `README.md` using the [`markdown-toc`](https://github.com/ardumont/markdown-toc) Emacs package.
 - [ ] Add this new version control back end to the list of supported systems under the `Version control in use` header of `.github/ISSUE_TEMPLATE.md`.
 
-##### Testing
+## Testing
 
 - [ ] Added one or more test to `elsewhere-test.el` for any new code.
 
-##### Version numbers
+## Version numbers
 
 <!--
 This "Version numbers" section is mostly for maintainers.
@@ -48,7 +48,7 @@ The version numbering scheme should follow [semantic versioning](https://semver.
 - [ ] Updated version number in the `Version` key on line 11 of `elsewhere-test.el`.
 - [ ] Updated version number for the `elsewhere` dependency on line 12 of `elsewhere-test.el`.
 
-##### Changelog
+## Changelog
 
 - [ ] Add one or more bullet points under the `[Unreleased] [Unreleased]` level 2 header on line 8 of `CHANGELOG.md` containing a brief summary of your changes. Each of these bullet points should be underneath a level 3 header of `Added`, `Removed`, `Changed`, or `Fixed` --- whichever most appropriately categorizes that bullet point.
 

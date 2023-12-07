@@ -5,15 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] [Unreleased]
+## [Unreleased]
 
-## [1.3.0 - 2023-12-01] [1.3.0]
+### Added
+
+* Added variable `elsewhere-version`.
+
+### Changed
+
+* Improved documentation.
+
+## [1.3.0]
 
 ### Added
 
 * Add ability to select a remote.
 
-## [1.2.1 - 2023-12-01] [1.2.1]
+## [1.2.1]
 
 ### Changed
 
@@ -22,7 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Improve tests for permalinks which contain Git commit hashes.
 * Add error handling for if a Git remote is not configured.
 
-## [1.2.0 - 2023-11-07] [1.2.0]
+## [1.2.0]
 
 ### Added
 
@@ -32,7 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Fix broken start and end arguments for `elsewhere-build-url`
 
-## [1.1.0 - 2023-11-06] [1.1.0]
+## [1.1.0]
 
 ### Added
 
@@ -53,7 +61,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Remove interactive? argument for `elsewhere-open`
 * Remove interactive? argument for `elsewhere-build-url`
 
-## [1.0.0 - 2023-07-26] [1.0.0]
+## [1.0.0]
 
 ### Added
 
